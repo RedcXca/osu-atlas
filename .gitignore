@@ -1,0 +1,13 @@
+.next
+.next_stale*
+node_modules
+.env
+.env.local
+.env.development.local
+.env.production.local
+.DS_Store
+*.tsbuildinfo
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
