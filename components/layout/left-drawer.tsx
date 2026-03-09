@@ -1,4 +1,3 @@
-import { BASE_PATH } from "@/lib/config/constants";
 import { APP_ROUTES } from "@/lib/config/routes";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
 
@@ -84,7 +83,7 @@ export function LeftDrawer({
               alt="osu!"
               className="login-card__logo"
               height={96}
-              src={`${BASE_PATH}/brand-mark.svg`}
+              src="/brand-mark.svg"
               width={96}
             />
             <a className="button button--primary" href={APP_ROUTES.osuLogin}>

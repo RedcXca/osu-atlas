@@ -1,4 +1,3 @@
-import { BASE_PATH } from "@/lib/config/constants";
 import type { OsuViewer } from "@/lib/models";
 
 type SiteHeaderProps = {
@@ -14,7 +13,7 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
             alt="osu!"
             className="site-header__logo"
             height={54}
-            src={`${BASE_PATH}/brand-mark.svg`}
+            src="/brand-mark.svg"
             width={54}
           />
         </a>
