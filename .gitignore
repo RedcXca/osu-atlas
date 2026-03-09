@@ -6,8 +6,11 @@ node_modules
 .env.development.local
 .env.production.local
 .DS_Store
+CLAUDE.md
+.claude/
 *.tsbuildinfo
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+out/

@@ -1,16 +1,19 @@
 import { MapDashboard } from "@/components/dashboard/map-dashboard";
-import { readHomePageData } from "@/lib/server/page-data";
+import { createEmptyFriendSnapshot } from "@/lib/domain/friend-snapshot";
+import { getProjectedWorldCountries } from "@/lib/server/world-map";
 
-type HomePageProps = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
-
-export default async function Home({ searchParams }: HomePageProps) {
-  const pageData = await readHomePageData((await searchParams) ?? {});
+export default function Home() {
+  const snapshot = createEmptyFriendSnapshot();
 
   return (
     <main className="page-shell">
-      <MapDashboard {...pageData} />
+      <MapDashboard
+        authMessage={null}
+        demoMode={true}
+        mapCountries={getProjectedWorldCountries(snapshot.countries)}
+        snapshot={snapshot}
+        viewer={null}
+      />
     </main>
   );
 }
