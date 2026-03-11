@@ -1,7 +1,7 @@
 import "server-only";
 
 import { AUTH_MESSAGE_BY_CODE } from "@/lib/config/auth";
-import { createEmptyFriendSnapshot } from "@/lib/domain/friend-snapshot";
+import { createDemoSnapshot } from "@/lib/domain/demo-data";
 import type { FriendSnapshot, OsuViewer, WorldMapCountry } from "@/lib/models";
 import { readSessionIdFromCookies } from "@/lib/server/cookies";
 import { getStoredSession } from "@/lib/server/session-store";
@@ -28,7 +28,7 @@ export async function readHomePageData(
   const authMessage = authKey ? AUTH_MESSAGE_BY_CODE[authKey] ?? null : null;
   const sessionId = await readSessionIdFromCookies();
   const session = sessionId ? getStoredSession(sessionId) : null;
-  const snapshot = session?.snapshot ?? createEmptyFriendSnapshot();
+  const snapshot = session?.snapshot ?? createDemoSnapshot();
 
   return {
     authMessage,
