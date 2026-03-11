@@ -1,3 +1,4 @@
+import { LanguageSelector } from "@/components/layout/language-selector";
 import type { OsuViewer } from "@/lib/models";
 
 type SiteHeaderProps = {
@@ -21,7 +22,7 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
         <div className="site-header__meta">
           <h1 className="site-header__title">osu! Atlas</h1>
           <span className="site-header__credit">
-            built by{" "}
+            by{" "}
             <a href="https://github.com/RedcXca" target="_blank" rel="noopener noreferrer">
               RedcXca
             </a>
@@ -29,8 +30,9 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
         </div>
       </div>
 
-      {viewer ? (
-        <div className="site-header__session">
+      <div className="site-header__actions">
+        <LanguageSelector />
+        {viewer ? (
           <div className="site-header__user">
             <img
               alt={viewer.username}
@@ -44,8 +46,8 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
               <span className="site-header__session-label">osu!</span>
             </div>
           </div>
-        </div>
-      ) : null}
+        ) : null}
+      </div>
     </header>
   );
 }

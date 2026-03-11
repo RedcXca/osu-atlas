@@ -1,5 +1,9 @@
 import { APP_ROUTES } from "@/lib/config/routes";
+import { getCountryDisplayName } from "@/lib/domain/countries";
+import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
+
+const DEFAULT_AVATAR = "https://osu.ppy.sh/images/layout/avatar-guest@2x.png";
 
 type LeftDrawerProps = {
   authMessage: string | null;
@@ -8,18 +12,25 @@ type LeftDrawerProps = {
   viewer: OsuViewer | null;
 };
 
+// game mode labels stay in English per design
+const MODE_LABELS: Record<OsuGameMode, string> = {
+  fruits: "Catch",
+  mania: "Mania",
+  osu: "osu!",
+  taiko: "Taiko"
+};
+
 export function LeftDrawer({
   authMessage,
   demoMode,
   snapshot,
   viewer
 }: Readonly<LeftDrawerProps>) {
-  const modeLabels: Record<OsuGameMode, string> = {
-    fruits: "Catch",
-    mania: "Mania",
-    osu: "osu!",
-    taiko: "Taiko"
-  };
+  const { locale, t } = useLanguage();
+
+  const displayName = viewer?.username ?? "demo";
+  const displayAvatar = viewer?.avatarUrl ?? DEFAULT_AVATAR;
+
   const allFriends = Object.values(snapshot.countries).flatMap((country) => country.friends);
   const modeCards = (["osu", "taiko", "fruits", "mania"] as OsuGameMode[]).map((mode) => {
     const bestFriend = allFriends.reduce<{
@@ -52,7 +63,7 @@ export function LeftDrawer({
 
     return {
       ...bestFriend,
-      label: modeLabels[mode],
+      label: MODE_LABELS[mode],
       mode
     };
   });
@@ -77,77 +88,73 @@ export function LeftDrawer({
   return (
     <aside className="panel drawer left-drawer">
       <div className="drawer__body">
-        {demoMode || !viewer ? (
-          <section className="hero-card login-card">
-            <img
-              alt="osu!"
-              className="login-card__logo"
-              height={96}
-              src="/brand-mark.svg"
-              width={96}
-            />
+        <section className="hero-card left-drawer__hero">
+          <div className="profile-row">
+            <img alt={displayName} height={64} src={displayAvatar} width={64} />
+            <div className="profile-meta">
+              <strong>{displayName}</strong>
+              {demoMode ? (
+                <span className="profile-meta__detail">{t.demoLabel}</span>
+              ) : null}
+            </div>
+          </div>
+
+          {demoMode ? (
             <a className="button button--primary" href={APP_ROUTES.osuLogin}>
-              Login with osu!
+              {t.loginWithOsu}
             </a>
-          </section>
-        ) : (
-          <>
-            <section className="hero-card left-drawer__hero">
-              <div className="profile-row">
-                <img alt={viewer.username} height={64} src={viewer.avatarUrl} width={64} />
-                <div className="profile-meta">
-                  <strong>{viewer.username}</strong>
-                </div>
-              </div>
+          ) : null}
 
-              <div className="stat-grid left-drawer__stat-grid">
-                <article className="stat-card left-drawer__stat-card">
-                  <span>Friends</span>
-                  <strong>{snapshot.totals.friendCount}</strong>
-                </article>
-                <article className="stat-card left-drawer__stat-card">
-                  <span>Countries</span>
-                  <strong>{snapshot.totals.countryCount}</strong>
-                </article>
-              </div>
+          <div className="stat-grid left-drawer__stat-grid">
+            <article className="stat-card left-drawer__stat-card">
+              <span>{t.friends}</span>
+              <strong>{snapshot.totals.friendCount}</strong>
+            </article>
+            <article className="stat-card left-drawer__stat-card">
+              <span>{t.countries}</span>
+              <strong>{snapshot.totals.countryCount}</strong>
+            </article>
+          </div>
 
-              <div className="left-drawer__country-strip">
-                <article className="left-drawer__country-pill">
-                  <span className="left-drawer__country-pill-label">Top</span>
-                  <strong>{topCountry?.code ?? "—"}</strong>
-                  <span className="left-drawer__country-pill-meta">
-                    {topCountry ? `${topCountry.name} · ${topCountry.count}` : "—"}
-                  </span>
-                </article>
+          <div className="left-drawer__country-strip">
+            <article className="left-drawer__country-pill">
+              <span className="left-drawer__country-pill-label">{t.top}</span>
+              <strong>{topCountry?.code ?? "—"}</strong>
+              <span className="left-drawer__country-pill-meta">
+                {topCountry
+                  ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
+                  : "—"}
+              </span>
+            </article>
 
-                <article className="left-drawer__country-pill" data-tone="accent">
-                  <span className="left-drawer__country-pill-label">Rarest</span>
-                  <strong>{rarestCountry?.code ?? "—"}</strong>
-                  <span className="left-drawer__country-pill-meta">
-                    {rarestCountry ? `${rarestCountry.name} · ${rarestCountry.count}` : "—"}
-                  </span>
-                </article>
-              </div>
-            </section>
+            <article className="left-drawer__country-pill" data-tone="accent">
+              <span className="left-drawer__country-pill-label">{t.rarest}</span>
+              <strong>{rarestCountry?.code ?? "—"}</strong>
+              <span className="left-drawer__country-pill-meta">
+                {rarestCountry
+                  ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`
+                  : "—"}
+              </span>
+            </article>
+          </div>
+        </section>
 
-            <section className="widget-grid left-drawer__mode-grid">
-              {modeCards.map((card) => (
-                <article
-                  className="widget-card widget-card--metric mode-rank-card"
-                  key={card.mode}
-                >
-                  <span className="widget-card__label">{card.label}</span>
-                  <strong>{card.friend?.username ?? "—"}</strong>
-                  {card.rank !== null ? (
-                    <span className="mode-rank-card__rank">#{card.rank.toLocaleString()}</span>
-                  ) : (
-                    <span className="widget-card__subcopy">—</span>
-                  )}
-                </article>
-              ))}
-            </section>
-          </>
-        )}
+        <section className="widget-grid left-drawer__mode-grid">
+          {modeCards.map((card) => (
+            <article
+              className="widget-card widget-card--metric mode-rank-card"
+              key={card.mode}
+            >
+              <span className="widget-card__label">{card.label}</span>
+              <strong>{card.friend?.username ?? "—"}</strong>
+              {card.rank !== null ? (
+                <span className="mode-rank-card__rank">#{card.rank.toLocaleString()}</span>
+              ) : (
+                <span className="widget-card__subcopy">—</span>
+              )}
+            </article>
+          ))}
+        </section>
 
         {authMessage ? (
           <section className="status-card" data-tone="danger">

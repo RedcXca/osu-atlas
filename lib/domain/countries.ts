@@ -1,10 +1,10 @@
-export function getCountryDisplayName(countryCode: string | null) {
+export function getCountryDisplayName(countryCode: string | null, locale = "en") {
   if (!countryCode || countryCode === "UNKNOWN") {
     return "Unknown";
   }
 
   try {
-    const regions = new Intl.DisplayNames(["en"], { type: "region" });
+    const regions = new Intl.DisplayNames([locale], { type: "region" });
     return regions.of(countryCode.toUpperCase()) ?? countryCode.toUpperCase();
   } catch {
     return countryCode.toUpperCase();

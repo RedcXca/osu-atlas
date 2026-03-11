@@ -1,4 +1,6 @@
 import type { CSSProperties } from "react";
+import { getCountryDisplayName } from "@/lib/domain/countries";
+import { useLanguage } from "@/lib/i18n/context";
 import type { CountryFriendBucket } from "@/lib/models";
 
 type CountryBreakdownListProps = {
@@ -12,6 +14,8 @@ export function CountryBreakdownList({
   onSelectCountry,
   totalFriends
 }: Readonly<CountryBreakdownListProps>) {
+  const { locale } = useLanguage();
+
   return (
     <div className="country-breakdown-list">
       {countries.map((country, index) => {
@@ -30,7 +34,7 @@ export function CountryBreakdownList({
             <span className="country-breakdown-row__rank">{index + 1}</span>
             <div className="country-breakdown-row__body">
               <div className="country-breakdown-row__meta">
-                <strong>{country.name}</strong>
+                <strong>{getCountryDisplayName(country.code, locale)}</strong>
                 <span>{country.count}</span>
               </div>
               <span

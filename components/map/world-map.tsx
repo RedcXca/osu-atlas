@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { getCountryDisplayName } from "@/lib/domain/countries";
+import { useLanguage } from "@/lib/i18n/context";
 import type { WorldMapCountry } from "@/lib/models";
 
 type WorldMapProps = {
@@ -100,6 +101,7 @@ export function WorldMap({
   onSelectCountry,
   selectedCode
 }: Readonly<WorldMapProps>) {
+  const { locale, t } = useLanguage();
   const svgRef = useRef<SVGSVGElement | null>(null);
   const dragStateRef = useRef<DragState | null>(null);
   const suppressClickRef = useRef(false);
@@ -113,7 +115,7 @@ export function WorldMap({
           code: focusedCode,
           count: 0,
           hasFriends: false,
-          name: getCountryDisplayName(focusedCode),
+          name: getCountryDisplayName(focusedCode, locale),
           path: ""
         }
       : null);
@@ -234,7 +236,7 @@ export function WorldMap({
         <div className="map-frame" data-dragging={isDragging} data-zoomed={isZoomed}>
           <div className="map-controls" onPointerDown={stopMapControlPointer}>
             <button
-              aria-label="Zoom in"
+              aria-label={t.zoomIn}
               className="map-control"
               onClick={(event) => {
                 event.stopPropagation();
@@ -245,7 +247,7 @@ export function WorldMap({
               +
             </button>
             <button
-              aria-label="Zoom out"
+              aria-label={t.zoomOut}
               className="map-control"
               onClick={(event) => {
                 event.stopPropagation();
@@ -256,7 +258,7 @@ export function WorldMap({
               -
             </button>
             <button
-              aria-label="Reset zoom"
+              aria-label={t.resetZoom}
               className="map-control map-control--reset"
               onClick={(event) => {
                 event.stopPropagation();
@@ -264,21 +266,21 @@ export function WorldMap({
               }}
               type="button"
             >
-              Reset
+              {t.reset}
             </button>
           </div>
 
           {focusedCountry ? (
             <div className="map-focus-card">
-              <strong>{focusedCountry.name}</strong>
+              <strong>{getCountryDisplayName(focusedCountry.code, locale)}</strong>
               <p>
-                {focusedCountry.count} friend{focusedCountry.count === 1 ? "" : "s"}
+                {t.friendCount(focusedCountry.count)}
               </p>
             </div>
           ) : null}
 
           <svg
-            aria-label="World map"
+            aria-label={t.worldMap}
             className="map-svg"
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
@@ -308,7 +310,8 @@ export function WorldMap({
               const isInteractive = Boolean(country.code);
               const isActive = country.code !== null && (country.code === hoveredCode || country.code === selectedCode);
               const tone = getCountryTone(country.count, maxCount);
-              const label = `${country.name}: ${country.count} friend${country.count === 1 ? "" : "s"}`;
+              const countryName = getCountryDisplayName(country.code, locale);
+              const label = `${countryName}: ${t.friendCount(country.count)}`;
 
               return (
                 <path
@@ -361,7 +364,7 @@ export function WorldMap({
           {unknownCount > 0 ? (
             <div className="map-footer">
               <div className="map-unknown">
-                Unknown location: {unknownCount} friend{unknownCount === 1 ? "" : "s"}
+                {t.unknownLocation}: {t.friendCount(unknownCount)}
               </div>
             </div>
           ) : null}

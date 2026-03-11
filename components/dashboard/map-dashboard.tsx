@@ -5,7 +5,7 @@ import { LeftDrawer } from "@/components/layout/left-drawer";
 import { RightDrawer } from "@/components/layout/right-drawer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { WorldMap } from "@/components/map/world-map";
-import { getCountryDisplayName } from "@/lib/domain/countries";
+import { LanguageProvider } from "@/lib/i18n/context";
 import { sortCountryBuckets, sortFriends } from "@/lib/domain/friend-snapshot";
 import type {
   CountrySortMode,
@@ -59,9 +59,7 @@ export function MapDashboard({
         code: selectedCode,
         count: 0,
         friends: [],
-        name:
-          mapCountries.find((country) => country.code === selectedCode)?.name ??
-          getCountryDisplayName(selectedCode)
+        name: mapCountries.find((country) => country.code === selectedCode)?.name ?? selectedCode
       }
     );
   }, [mapCountries, selectedCode, snapshot.countries]);
@@ -85,37 +83,39 @@ export function MapDashboard({
   };
 
   return (
-    <div className="page-layout">
-      <SiteHeader viewer={viewer} />
-      <section className="dashboard-grid">
-        <LeftDrawer
-          authMessage={authMessage}
-          demoMode={demoMode}
-          snapshot={snapshot}
-          viewer={viewer}
-        />
-        <WorldMap
-          hoveredCode={hoveredCode}
-          mapCountries={mapCountries}
-          unknownCount={snapshot.countries.UNKNOWN?.count ?? 0}
-          onHoverChange={setHoveredCode}
-          onSelectCountry={handleSelectCountry}
-          selectedCode={selectedCode}
-        />
-        <RightDrawer
-          countries={visibleCountries}
-          countrySortMode={countrySortMode}
-          filteredFriends={visibleFriends}
-          onCountrySortModeChange={setCountrySortMode}
-          onFriendSortModeChange={setFriendSortMode}
-          onQueryChange={setQuery}
-          onSelectCountry={handleSelectCountry}
-          friendSortMode={friendSortMode}
-          query={query}
-          selectedCountry={selectedCountry}
-          totalFriends={snapshot.totals.friendCount}
-        />
-      </section>
-    </div>
+    <LanguageProvider>
+      <div className="page-layout">
+        <SiteHeader viewer={viewer} />
+        <section className="dashboard-grid">
+          <LeftDrawer
+            authMessage={authMessage}
+            demoMode={demoMode}
+            snapshot={snapshot}
+            viewer={viewer}
+          />
+          <WorldMap
+            hoveredCode={hoveredCode}
+            mapCountries={mapCountries}
+            unknownCount={snapshot.countries.UNKNOWN?.count ?? 0}
+            onHoverChange={setHoveredCode}
+            onSelectCountry={handleSelectCountry}
+            selectedCode={selectedCode}
+          />
+          <RightDrawer
+            countries={visibleCountries}
+            countrySortMode={countrySortMode}
+            filteredFriends={visibleFriends}
+            onCountrySortModeChange={setCountrySortMode}
+            onFriendSortModeChange={setFriendSortMode}
+            onQueryChange={setQuery}
+            onSelectCountry={handleSelectCountry}
+            friendSortMode={friendSortMode}
+            query={query}
+            selectedCountry={selectedCountry}
+            totalFriends={snapshot.totals.friendCount}
+          />
+        </section>
+      </div>
+    </LanguageProvider>
   );
 }

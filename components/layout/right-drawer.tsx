@@ -1,6 +1,8 @@
 import { CountryBreakdownList } from "@/components/countries/country-breakdown-list";
 import { FriendList } from "@/components/friends/friend-list";
 import { SortAccordion } from "@/components/ui/sort-accordion";
+import { useLanguage } from "@/lib/i18n/context";
+import { getCountryDisplayName } from "@/lib/domain/countries";
 import type {
   CountryFriendBucket,
   CountrySortMode,
@@ -22,6 +24,7 @@ type RightDrawerProps = {
   totalFriends: number;
 };
 
+// game mode sort labels stay in English
 const FRIEND_SORT_OPTIONS: { label: string; value: FriendSortMode }[] = [
   { label: "A-Z", value: "alphabetical" },
   { label: "osu!", value: "osu" },
@@ -43,15 +46,20 @@ export function RightDrawer({
   selectedCountry,
   totalFriends
 }: Readonly<RightDrawerProps>) {
+  const { locale, t } = useLanguage();
+  const localizedCountryName = selectedCountry
+    ? getCountryDisplayName(selectedCountry.code, locale)
+    : null;
+
   return (
     <aside className="panel drawer right-drawer">
       <div className="drawer__body">
         {selectedCountry ? (
           <>
             <div className="stack">
-              <h2 className="drawer__title drawer__title--proper">{selectedCountry.name}</h2>
+              <h2 className="drawer__title drawer__title--proper">{localizedCountryName}</h2>
               <p className="drawer__copy">
-                {selectedCountry.count} friend{selectedCountry.count === 1 ? "" : "s"}
+                {t.friendCount(selectedCountry.count)}
               </p>
             </div>
 
@@ -60,11 +68,11 @@ export function RightDrawer({
                 <input
                   className="input"
                   onChange={(event) => onQueryChange(event.target.value)}
-                  placeholder="Search friends"
+                  placeholder={t.searchFriends}
                   value={query}
                 />
                 <SortAccordion
-                  label="Sort users"
+                  label={t.sortUsers}
                   onChange={onFriendSortModeChange}
                   options={FRIEND_SORT_OPTIONS}
                   value={friendSortMode}
@@ -77,11 +85,11 @@ export function RightDrawer({
                 <FriendList friends={filteredFriends} sortMode={friendSortMode} />
               ) : selectedCountry.count === 0 ? (
                 <div className="empty-card">
-                  No friends mapped here yet.
+                  {t.noFriendsMapped}
                 </div>
               ) : (
                 <div className="empty-card">
-                  No matches for <strong>{query}</strong>.
+                  {t.noMatchesFor} <strong>{query}</strong>.
                 </div>
               )}
             </section>
@@ -89,12 +97,12 @@ export function RightDrawer({
         ) : (
           <>
             <div className="toolbar-row toolbar-row--split">
-              <h2 className="drawer__title drawer__title--proper">Countries</h2>
+              <h2 className="drawer__title drawer__title--proper">{t.countries}</h2>
               <SortAccordion
-                label="Sort countries"
+                label={t.sortCountries}
                 onChange={onCountrySortModeChange}
                 options={[
-                  { label: "Count", value: "count" },
+                  { label: t.count, value: "count" },
                   { label: "A-Z", value: "alphabetical" }
                 ] satisfies { label: string; value: CountrySortMode }[]}
                 value={countrySortMode}
@@ -108,7 +116,7 @@ export function RightDrawer({
                 totalFriends={totalFriends}
               />
             ) : (
-              <section className="empty-card">No mapped countries yet.</section>
+              <section className="empty-card">{t.noMappedCountries}</section>
             )}
           </>
         )}
