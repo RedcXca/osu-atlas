@@ -18,6 +18,27 @@
     }
   </style>
   <circle class="bg" cx="175" cy="175" r="150" />
+
+  <defs>
+    <clipPath id="gc">
+      <circle cx="175" cy="175" r="133" />
+    </clipPath>
+  </defs>
+
+  <!-- globe grid lines (behind osu! text) -->
+  <g clip-path="url(#gc)" opacity="0.22" fill="none" stroke="#ffffff" stroke-width="1.8">
+    <!-- equator -->
+    <line x1="40" y1="175" x2="310" y2="175" />
+    <!-- latitude lines -->
+    <line x1="58" y1="112" x2="292" y2="112" />
+    <line x1="58" y1="238" x2="292" y2="238" />
+    <line x1="96" y1="68" x2="254" y2="68" />
+    <line x1="96" y1="282" x2="254" y2="282" />
+    <!-- meridians -->
+    <ellipse cx="175" cy="175" rx="44" ry="130" />
+    <ellipse cx="175" cy="175" rx="92" ry="130" />
+  </g>
+
   <path
     class="logo"
     d="M100.1,206.4c-4.7,0-8.8-0.8-12.3-2.3s-6.4-3.7-8.6-6.4c-2.3-2.7-4-5.9-5.2-9.6c-1.2-3.7-1.7-7.6-1.7-11.9c0-4.3,0.6-8.3,1.7-12c1.2-3.7,2.9-7,5.2-9.7c2.3-2.7,5.2-4.9,8.6-6.5
