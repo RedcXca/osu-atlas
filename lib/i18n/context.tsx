@@ -27,6 +27,7 @@ export function LanguageProvider({ children }: Readonly<{ children: React.ReactN
 
   useEffect(() => {
     document.documentElement.lang = locale;
+    document.documentElement.dir = locale === "ar" || locale === "he" ? "rtl" : "ltr";
   }, [locale]);
 
   const setLocale = useCallback((next: Locale) => {
