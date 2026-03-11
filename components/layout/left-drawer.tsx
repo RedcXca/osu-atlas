@@ -1,5 +1,5 @@
 import { APP_ROUTES } from "@/lib/config/routes";
-import { getCountryDisplayName } from "@/lib/domain/countries";
+import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
 
@@ -119,7 +119,7 @@ export function LeftDrawer({
           <div className="left-drawer__country-strip">
             <article className="left-drawer__country-pill">
               <span className="left-drawer__country-pill-label">{t.top}</span>
-              <strong>{topCountry?.code ?? "—"}</strong>
+              <strong>{topCountry ? `${countryCodeToFlag(topCountry.code)} ${topCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta">
                 {topCountry
                   ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
@@ -129,7 +129,7 @@ export function LeftDrawer({
 
             <article className="left-drawer__country-pill" data-tone="accent">
               <span className="left-drawer__country-pill-label">{t.rarest}</span>
-              <strong>{rarestCountry?.code ?? "—"}</strong>
+              <strong>{rarestCountry ? `${countryCodeToFlag(rarestCountry.code)} ${rarestCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta">
                 {rarestCountry
                   ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`

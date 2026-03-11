@@ -77,6 +77,47 @@ export const LOCALE_LABELS: Record<Locale, string> = {
   "zh-tw": "繁體中文（台灣）"
 };
 
+// maps each locale to the country code used for its flag emoji
+export const LOCALE_FLAGS: Record<Locale, string> = {
+  en: "🇬🇧",
+  ar: "🇸🇦",
+  be: "🇧🇾",
+  bg: "🇧🇬",
+  ca: "🇪🇸",
+  cs: "🇨🇿",
+  da: "🇩🇰",
+  de: "🇩🇪",
+  el: "🇬🇷",
+  es: "🇪🇸",
+  fi: "🇫🇮",
+  fil: "🇵🇭",
+  fr: "🇫🇷",
+  he: "🇮🇱",
+  hu: "🇭🇺",
+  id: "🇮🇩",
+  it: "🇮🇹",
+  ja: "🇯🇵",
+  ko: "🇰🇷",
+  lt: "🇱🇹",
+  nl: "🇳🇱",
+  no: "🇳🇴",
+  pl: "🇵🇱",
+  pt: "🇵🇹",
+  "pt-br": "🇧🇷",
+  ro: "🇷🇴",
+  ru: "🇷🇺",
+  sk: "🇸🇰",
+  sl: "🇸🇮",
+  sr: "🇷🇸",
+  sv: "🇸🇪",
+  th: "🇹🇭",
+  tr: "🇹🇷",
+  uk: "🇺🇦",
+  vi: "🇻🇳",
+  zh: "🇨🇳",
+  "zh-tw": "🇹🇼"
+};
+
 // plural helpers
 function simplePlural(singular: string, plural: string) {
   return (count: number) => `${count} ${count === 1 ? singular : plural}`;

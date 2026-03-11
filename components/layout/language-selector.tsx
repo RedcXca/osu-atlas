@@ -2,9 +2,10 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useLanguage } from "@/lib/i18n/context";
-import { LOCALE_LABELS, LOCALES, type Locale } from "@/lib/i18n/translations";
+import { LOCALE_FLAGS, LOCALE_LABELS, LOCALES, type Locale } from "@/lib/i18n/translations";
 
-const LOCALE_OPTIONS: { label: string; value: Locale }[] = LOCALES.map((locale) => ({
+const LOCALE_OPTIONS: { flag: string; label: string; value: Locale }[] = LOCALES.map((locale) => ({
+  flag: LOCALE_FLAGS[locale],
   label: LOCALE_LABELS[locale],
   value: locale
 }));
@@ -63,7 +64,7 @@ export function LanguageSelector() {
           <ellipse cx="8" cy="8" rx="2.8" ry="6" fill="none" stroke="currentColor" strokeWidth="1.4" />
           <path d="M2 8h12" fill="none" stroke="currentColor" strokeWidth="1.4" />
         </svg>
-        <span className="language-selector__value">{LOCALE_LABELS[locale]}</span>
+        <span className="language-selector__value">{LOCALE_FLAGS[locale]} {LOCALE_LABELS[locale]}</span>
         <svg
           aria-hidden="true"
           className="language-selector__chevron"
@@ -100,7 +101,7 @@ export function LanguageSelector() {
               role="option"
               type="button"
             >
-              {option.label}
+              {option.flag} {option.label}
             </button>
           ))}
         </div>
