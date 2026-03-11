@@ -107,13 +107,7 @@ img {
 }
 
 .panel::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--accent), var(--accent-deep));
-  content: "";
+  display: none;
 }
 
 .panel::after {
@@ -399,10 +393,7 @@ img {
 }
 
 .left-drawer__country-pill[data-tone="accent"] {
-  border-color: rgba(255, 102, 170, 0.3);
-  background:
-    radial-gradient(circle at top right, rgba(255, 102, 170, 0.16), transparent 58%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(0, 0, 0, 0.08));
+  border-color: var(--line);
 }
 
 .left-drawer__country-pill-label {
