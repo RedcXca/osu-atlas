@@ -1,6 +1,8 @@
 import { MapDashboard } from "@/components/dashboard/map-dashboard";
 import { readHomePageData } from "@/lib/server/page-data";
 
+export const dynamic = "force-dynamic";
+
 type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
