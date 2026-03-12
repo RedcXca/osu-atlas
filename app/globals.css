@@ -1432,6 +1432,12 @@ a.mode-rank-card:hover {
 }
 
 @media (max-width: 1180px) {
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
   .site-header {
     grid-template-columns: 1fr;
   }
@@ -1446,27 +1452,9 @@ a.mode-rank-card:hover {
     align-items: flex-start;
   }
 
-  .dashboard-grid {
-    grid-template-columns: 290px minmax(0, 1fr);
-  }
-
-  .right-drawer {
-    grid-column: 1 / -1;
-    min-height: 340px;
-  }
-}
-
-@media (max-width: 860px) {
-  html,
-  body {
-    height: auto;
-    overflow: auto;
-  }
-
   .page-shell {
     height: auto;
     min-height: 100vh;
-    padding: 14px;
     overflow: visible;
   }
 
@@ -1483,15 +1471,6 @@ a.mode-rank-card:hover {
 
   .left-drawer .drawer__body {
     overflow: visible;
-  }
-
-  .map-panel {
-    min-height: 400px;
-  }
-
-  .drawer__body,
-  .map-shell {
-    padding: 16px;
   }
 
   .map-frame,
@@ -1513,6 +1492,17 @@ a.mode-rank-card:hover {
 
   .right-drawer {
     min-height: 300px;
+  }
+}
+
+@media (max-width: 860px) {
+  .page-shell {
+    padding: 14px;
+  }
+
+  .drawer__body,
+  .map-shell {
+    padding: 16px;
   }
 }
 
