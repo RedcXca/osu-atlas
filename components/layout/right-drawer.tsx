@@ -2,7 +2,7 @@ import { CountryBreakdownList } from "@/components/countries/country-breakdown-l
 import { FriendList } from "@/components/friends/friend-list";
 import { SortAccordion } from "@/components/ui/sort-accordion";
 import { useLanguage } from "@/lib/i18n/context";
-import { countryCodeToFlag } from "@/lib/domain/countries";
+import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
 import type {
   CountryFriendBucket,
   CountrySortMode,
@@ -46,9 +46,9 @@ export function RightDrawer({
   selectedCountry,
   totalFriends
 }: Readonly<RightDrawerProps>) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
   const localizedCountryName = selectedCountry
-    ? `${countryCodeToFlag(selectedCountry.code)} ${selectedCountry.name}`
+    ? `${countryCodeToFlag(selectedCountry.code)} ${getCountryDisplayName(selectedCountry.code, locale)}`
     : null;
 
   return (
@@ -57,7 +57,7 @@ export function RightDrawer({
         {selectedCountry ? (
           <>
             <div className="stack">
-              <h2 className="drawer__title drawer__title--proper">{localizedCountryName}</h2>
+              <h2 className="drawer__title drawer__title--proper" suppressHydrationWarning>{localizedCountryName}</h2>
               <p className="drawer__copy">
                 {t.friendCount(selectedCountry.count)}
               </p>

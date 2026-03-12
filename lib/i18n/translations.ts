@@ -221,7 +221,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Карта свету",
     noMappedCountries: "Яшчэ няма краін.",
     demoLabel: "дэма-рэжым",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Найлепшыя сябры па рэйтынгу",
     friendCount: slavicPlural("сябар", "сябры", "сяброў")
   },
   bg: {
@@ -247,7 +247,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Световна карта",
     noMappedCountries: "Все още няма държави.",
     demoLabel: "демо режим",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Най-високо класирани приятели",
     friendCount: simplePlural("приятел", "приятели")
   },
   ca: {
@@ -273,7 +273,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa del món",
     noMappedCountries: "Encara no hi ha països.",
     demoLabel: "mode demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Amics millor classificats",
     friendCount: simplePlural("amic", "amics")
   },
   cs: {
@@ -299,7 +299,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa světa",
     noMappedCountries: "Zatím žádné země.",
     demoLabel: "demo režim",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Nejlépe hodnocení přátelé",
     friendCount: slavicPlural("přítel", "přátelé", "přátel")
   },
   da: {
@@ -325,7 +325,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Verdenskort",
     noMappedCountries: "Ingen lande endnu.",
     demoLabel: "demo-tilstand",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Højest rangerede venner",
     friendCount: simplePlural("ven", "venner")
   },
   de: {
@@ -351,7 +351,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Weltkarte",
     noMappedCountries: "Noch keine Länder.",
     demoLabel: "Demo-Modus",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Bestplatzierte Freunde",
     friendCount: simplePlural("Freund", "Freunde")
   },
   el: {
@@ -377,7 +377,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Παγκόσμιος χάρτης",
     noMappedCountries: "Δεν υπάρχουν χώρες ακόμα.",
     demoLabel: "λειτουργία demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Κορυφαίοι φίλοι σε κατάταξη",
     friendCount: simplePlural("φίλος", "φίλοι")
   },
   es: {
@@ -403,7 +403,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa mundial",
     noMappedCountries: "Aún no hay países.",
     demoLabel: "modo demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Amigos mejor clasificados",
     friendCount: simplePlural("amigo", "amigos")
   },
   fi: {
@@ -429,7 +429,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Maailmankartta",
     noMappedCountries: "Ei vielä maita.",
     demoLabel: "demotila",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Parhaiten sijoittuneet kaverit",
     friendCount: simplePlural("kaveri", "kaveria")
   },
   fil: {
@@ -455,7 +455,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa ng mundo",
     noMappedCountries: "Wala pang bansa.",
     demoLabel: "demo mode",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Mga Kaibigan na May Pinakamataas na Ranggo",
     friendCount: noPlural("kaibigan")
   },
   fr: {
@@ -481,7 +481,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Carte du monde",
     noMappedCountries: "Pas encore de pays.",
     demoLabel: "mode démo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Amis les mieux classés",
     friendCount: simplePlural("ami", "amis")
   },
   he: {
@@ -507,7 +507,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "מפת עולם",
     noMappedCountries: "עדיין אין מדינות.",
     demoLabel: "מצב הדגמה",
-    topRanked: "Top Ranked Friends",
+    topRanked: "חברים בדירוג הגבוה ביותר",
     friendCount: simplePlural("חבר", "חברים")
   },
   hu: {
@@ -533,7 +533,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Világtérkép",
     noMappedCountries: "Még nincsenek országok.",
     demoLabel: "demo mód",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Legjobban rangsorolt barátok",
     friendCount: noPlural("barát")
   },
   id: {
@@ -559,7 +559,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Peta dunia",
     noMappedCountries: "Belum ada negara.",
     demoLabel: "mode demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Teman Peringkat Teratas",
     friendCount: noPlural("teman")
   },
   it: {
@@ -585,7 +585,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mappa del mondo",
     noMappedCountries: "Ancora nessun paese.",
     demoLabel: "modalità demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Amici meglio classificati",
     friendCount: simplePlural("amico", "amici")
   },
   ja: {
@@ -611,7 +611,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "世界地図",
     noMappedCountries: "まだ国がありません。",
     demoLabel: "デモモード",
-    topRanked: "Top Ranked Friends",
+    topRanked: "ランキング上位のフレンド",
     friendCount: (count) => `${count}人のフレンド`
   },
   ko: {
@@ -637,7 +637,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "세계 지도",
     noMappedCountries: "아직 국가가 없습니다.",
     demoLabel: "데모 모드",
-    topRanked: "Top Ranked Friends",
+    topRanked: "최고 랭킹 친구",
     friendCount: (count) => `친구 ${count}명`
   },
   lt: {
@@ -663,7 +663,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Pasaulio žemėlapis",
     noMappedCountries: "Dar nėra šalių.",
     demoLabel: "demo režimas",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Aukščiausio reitingo draugai",
     friendCount: slavicPlural("draugas", "draugai", "draugų")
   },
   nl: {
@@ -689,7 +689,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Wereldkaart",
     noMappedCountries: "Nog geen landen.",
     demoLabel: "demomodus",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Hoogst gerankte vrienden",
     friendCount: simplePlural("vriend", "vrienden")
   },
   no: {
@@ -715,7 +715,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Verdenskart",
     noMappedCountries: "Ingen land ennå.",
     demoLabel: "demomodus",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Høyest rangerte venner",
     friendCount: simplePlural("venn", "venner")
   },
   pl: {
@@ -741,7 +741,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa świata",
     noMappedCountries: "Brak krajów.",
     demoLabel: "tryb demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Najwyżej sklasyfikowani znajomi",
     friendCount: slavicPlural("znajomy", "znajomych", "znajomych")
   },
   pt: {
@@ -767,7 +767,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa do mundo",
     noMappedCountries: "Ainda não há países.",
     demoLabel: "modo de demonstração",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Amigos mais bem classificados",
     friendCount: simplePlural("amigo", "amigos")
   },
   "pt-br": {
@@ -793,7 +793,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa-múndi",
     noMappedCountries: "Ainda não há países.",
     demoLabel: "modo demonstração",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Amigos mais bem classificados",
     friendCount: simplePlural("amigo", "amigos")
   },
   ro: {
@@ -819,7 +819,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Harta lumii",
     noMappedCountries: "Încă nu sunt țări.",
     demoLabel: "mod demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Prieteni cu cel mai înalt rang",
     friendCount: simplePlural("prieten", "prieteni")
   },
   ru: {
@@ -845,7 +845,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Карта мира",
     noMappedCountries: "Пока нет стран.",
     demoLabel: "демо-режим",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Друзья с высшим рейтингом",
     friendCount: slavicPlural("друг", "друга", "друзей")
   },
   sk: {
@@ -871,7 +871,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Mapa sveta",
     noMappedCountries: "Zatiaľ žiadne krajiny.",
     demoLabel: "demo režim",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Najvyššie hodnotení priatelia",
     friendCount: slavicPlural("priateľ", "priatelia", "priateľov")
   },
   sl: {
@@ -897,7 +897,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Zemljevid sveta",
     noMappedCountries: "Še ni držav.",
     demoLabel: "demo način",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Najvišje uvrščeni prijatelji",
     friendCount: (count) => {
       const mod100 = count % 100;
 
@@ -939,7 +939,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Карта света",
     noMappedCountries: "Још нема држава.",
     demoLabel: "демо режим",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Најбоље рангирани пријатељи",
     friendCount: slavicPlural("пријатељ", "пријатеља", "пријатеља")
   },
   sv: {
@@ -965,7 +965,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Världskarta",
     noMappedCountries: "Inga länder ännu.",
     demoLabel: "demoläge",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Högst rankade vänner",
     friendCount: simplePlural("vän", "vänner")
   },
   th: {
@@ -991,7 +991,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "แผนที่โลก",
     noMappedCountries: "ยังไม่มีประเทศ",
     demoLabel: "โหมดสาธิต",
-    topRanked: "Top Ranked Friends",
+    topRanked: "เพื่อนอันดับสูงสุด",
     friendCount: noPlural("เพื่อน")
   },
   tr: {
@@ -1017,7 +1017,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Dünya haritası",
     noMappedCountries: "Henüz ülke yok.",
     demoLabel: "demo modu",
-    topRanked: "Top Ranked Friends",
+    topRanked: "En yüksek sıralamadaki arkadaşlar",
     friendCount: noPlural("arkadaş")
   },
   uk: {
@@ -1043,7 +1043,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Карта світу",
     noMappedCountries: "Ще немає країн.",
     demoLabel: "демо-режим",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Друзі з найвищим рейтингом",
     friendCount: slavicPlural("друг", "друзі", "друзів")
   },
   vi: {
@@ -1069,7 +1069,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "Bản đồ thế giới",
     noMappedCountries: "Chưa có quốc gia nào.",
     demoLabel: "chế độ demo",
-    topRanked: "Top Ranked Friends",
+    topRanked: "Bạn bè xếp hạng cao nhất",
     friendCount: noPlural("bạn bè")
   },
   zh: {
@@ -1095,7 +1095,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "世界地图",
     noMappedCountries: "还没有国家。",
     demoLabel: "演示模式",
-    topRanked: "Top Ranked Friends",
+    topRanked: "排名最高的好友",
     friendCount: (count) => `${count} 位好友`
   },
   "zh-tw": {
@@ -1121,7 +1121,7 @@ export const translations: Record<Locale, Translations> = {
     worldMap: "世界地圖",
     noMappedCountries: "還沒有國家。",
     demoLabel: "展示模式",
-    topRanked: "Top Ranked Friends",
+    topRanked: "排名最高的好友",
     friendCount: (count) => `${count} 位好友`
   }
 };

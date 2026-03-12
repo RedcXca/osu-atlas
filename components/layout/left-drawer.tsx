@@ -1,4 +1,4 @@
-import { countryCodeToFlag } from "@/lib/domain/countries";
+import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
 
@@ -27,7 +27,7 @@ export function LeftDrawer({
   snapshot,
   viewer
 }: Readonly<LeftDrawerProps>) {
-  const { t } = useLanguage();
+  const { locale, t } = useLanguage();
 
   const displayName = viewer?.username ?? "demo";
   const displayAvatar = viewer?.avatarUrl ?? DEFAULT_AVATAR;
@@ -117,9 +117,9 @@ export function LeftDrawer({
             >
               <span className="left-drawer__country-pill-label">{t.top}</span>
               <strong>{topCountry ? `${countryCodeToFlag(topCountry.code)} ${topCountry.code}` : "—"}</strong>
-              <span className="left-drawer__country-pill-meta">
+              <span className="left-drawer__country-pill-meta" suppressHydrationWarning>
                 {topCountry
-                  ? `${topCountry.name} · ${topCountry.count}`
+                  ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
                   : "—"}
               </span>
             </button>
@@ -133,9 +133,9 @@ export function LeftDrawer({
             >
               <span className="left-drawer__country-pill-label">{t.rarest}</span>
               <strong>{rarestCountry ? `${countryCodeToFlag(rarestCountry.code)} ${rarestCountry.code}` : "—"}</strong>
-              <span className="left-drawer__country-pill-meta">
+              <span className="left-drawer__country-pill-meta" suppressHydrationWarning>
                 {rarestCountry
-                  ? `${rarestCountry.name} · ${rarestCountry.count}`
+                  ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`
                   : "—"}
               </span>
             </button>
