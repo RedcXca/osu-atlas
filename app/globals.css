@@ -661,7 +661,7 @@ a.mode-rank-card:hover {
 
 .profile-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 16px;
 }
 
@@ -681,7 +681,6 @@ a.mode-rank-card:hover {
   flex-direction: column;
   min-width: 0;
   gap: 2px;
-  padding-top: 2px;
 }
 
 .profile-meta strong {
