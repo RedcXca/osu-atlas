@@ -167,7 +167,7 @@ img {
 
 .site-header__title {
   margin: 0;
-  font-size: clamp(1.55rem, 2.2vw, 2.15rem);
+  font-size: 2.15rem;
   font-weight: 800;
   line-height: 0.98;
 }
@@ -539,6 +539,15 @@ img {
   font-size: 0.76rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
+}
+
+.left-drawer__section-title {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .left-drawer__mode-grid {

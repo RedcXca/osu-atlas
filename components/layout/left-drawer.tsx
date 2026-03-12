@@ -142,6 +142,7 @@ export function LeftDrawer({
           </div>
         </section>
 
+        <h3 className="left-drawer__section-title">{t.topRanked}</h3>
         <section className="widget-grid left-drawer__mode-grid">
           {modeCards.map((card) => {
             const content = (
