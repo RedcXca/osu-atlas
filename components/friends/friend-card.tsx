@@ -21,7 +21,7 @@ export function FriendCard({ friend, sortMode }: Readonly<FriendCardProps>) {
   const rankMode = sortMode === "alphabetical" ? "osu" : sortMode;
   const rank = getFriendRankForMode(friend, rankMode);
   const rankSummary = rank !== null
-    ? `${MODE_LABELS[rankMode]} #${rank.toLocaleString()}`
+    ? `${MODE_LABELS[rankMode]} #${rank.toLocaleString("en")}`
     : `${MODE_LABELS[rankMode]} ${t.unranked}`;
 
   return (

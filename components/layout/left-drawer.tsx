@@ -1,4 +1,4 @@
-import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
+import { countryCodeToFlag } from "@/lib/domain/countries";
 import { APP_ROUTES } from "@/lib/config/routes";
 import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
@@ -28,7 +28,7 @@ export function LeftDrawer({
   snapshot,
   viewer
 }: Readonly<LeftDrawerProps>) {
-  const { locale, t } = useLanguage();
+  const { t } = useLanguage();
 
   const displayName = viewer?.username ?? "demo";
   const displayAvatar = viewer?.avatarUrl ?? DEFAULT_AVATAR;
@@ -129,7 +129,7 @@ export function LeftDrawer({
               <strong>{topCountry ? `${countryCodeToFlag(topCountry.code)} ${topCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta">
                 {topCountry
-                  ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
+                  ? `${topCountry.name} · ${topCountry.count}`
                   : "—"}
               </span>
             </button>
@@ -145,7 +145,7 @@ export function LeftDrawer({
               <strong>{rarestCountry ? `${countryCodeToFlag(rarestCountry.code)} ${rarestCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta">
                 {rarestCountry
-                  ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`
+                  ? `${rarestCountry.name} · ${rarestCountry.count}`
                   : "—"}
               </span>
             </button>
@@ -159,7 +159,7 @@ export function LeftDrawer({
                 <span className="widget-card__label">{card.label}</span>
                 <strong>{card.friend?.username ?? "—"}</strong>
                 {card.rank !== null ? (
-                  <span className="mode-rank-card__rank">#{card.rank.toLocaleString()}</span>
+                  <span className="mode-rank-card__rank">#{card.rank.toLocaleString("en")}</span>
                 ) : (
                   <span className="widget-card__subcopy">—</span>
                 )}

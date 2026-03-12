@@ -2,7 +2,7 @@ import { CountryBreakdownList } from "@/components/countries/country-breakdown-l
 import { FriendList } from "@/components/friends/friend-list";
 import { SortAccordion } from "@/components/ui/sort-accordion";
 import { useLanguage } from "@/lib/i18n/context";
-import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
+import { countryCodeToFlag } from "@/lib/domain/countries";
 import type {
   CountryFriendBucket,
   CountrySortMode,
@@ -46,9 +46,9 @@ export function RightDrawer({
   selectedCountry,
   totalFriends
 }: Readonly<RightDrawerProps>) {
-  const { locale, t } = useLanguage();
+  const { t } = useLanguage();
   const localizedCountryName = selectedCountry
-    ? `${countryCodeToFlag(selectedCountry.code)} ${getCountryDisplayName(selectedCountry.code, locale)}`
+    ? `${countryCodeToFlag(selectedCountry.code)} ${selectedCountry.name}`
     : null;
 
   return (

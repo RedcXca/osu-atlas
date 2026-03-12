@@ -310,8 +310,7 @@ export function WorldMap({
               const isInteractive = Boolean(country.code);
               const isActive = country.code !== null && (country.code === hoveredCode || country.code === selectedCode);
               const tone = getCountryTone(country.count, maxCount);
-              const countryName = getCountryDisplayName(country.code, locale);
-              const label = `${countryName}: ${t.friendCount(country.count)}`;
+              const label = `${country.name}: ${t.friendCount(country.count)}`;
 
               return (
                 <path

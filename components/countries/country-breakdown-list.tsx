@@ -1,6 +1,5 @@
 import type { CSSProperties } from "react";
-import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
-import { useLanguage } from "@/lib/i18n/context";
+import { countryCodeToFlag } from "@/lib/domain/countries";
 import type { CountryFriendBucket } from "@/lib/models";
 
 type CountryBreakdownListProps = {
@@ -14,7 +13,6 @@ export function CountryBreakdownList({
   onSelectCountry,
   totalFriends
 }: Readonly<CountryBreakdownListProps>) {
-  const { locale } = useLanguage();
 
   return (
     <div className="country-breakdown-list">
@@ -34,7 +32,7 @@ export function CountryBreakdownList({
             <span className="country-breakdown-row__rank">{countryCodeToFlag(country.code)}</span>
             <div className="country-breakdown-row__body">
               <div className="country-breakdown-row__meta">
-                <strong>{getCountryDisplayName(country.code, locale)}</strong>
+                <strong>{country.name}</strong>
                 <span>{country.count}</span>
               </div>
               <span
