@@ -1431,7 +1431,7 @@ a.mode-rank-card:hover {
   border: 0;
 }
 
-@media (max-width: 1180px) {
+@media (max-width: 1400px) {
   html,
   body {
     height: auto;
