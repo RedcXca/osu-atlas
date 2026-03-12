@@ -3,8 +3,7 @@ import "server-only";
 import { AUTH_MESSAGE_BY_CODE } from "@/lib/config/auth";
 import { createDemoSnapshot } from "@/lib/domain/demo-data";
 import type { FriendSnapshot, OsuViewer, WorldMapCountry } from "@/lib/models";
-import { readSessionIdFromCookies } from "@/lib/server/cookies";
-import { getStoredSession } from "@/lib/server/session-store";
+import { readSessionFromCookies } from "@/lib/server/cookies";
 import { getProjectedWorldCountries } from "@/lib/server/world-map";
 
 type SearchParamValue = string | string[] | undefined;
@@ -26,8 +25,7 @@ export async function readHomePageData(
 ): Promise<HomePageData> {
   const authKey = getSingleSearchParamValue(searchParams.auth);
   const authMessage = authKey ? AUTH_MESSAGE_BY_CODE[authKey] ?? null : null;
-  const sessionId = await readSessionIdFromCookies();
-  const session = sessionId ? getStoredSession(sessionId) : null;
+  const session = await readSessionFromCookies();
   const snapshot = session?.snapshot ?? createDemoSnapshot();
 
   return {

@@ -1,60 +1,33 @@
 import { NextResponse } from "next/server";
 import { buildFriendSnapshot } from "@/lib/domain/friend-snapshot";
-import { readSessionIdFromCookies } from "@/lib/server/cookies";
+import { readSessionFromCookies, applySessionCookie } from "@/lib/server/cookies";
 import { fetchFriends, OsuApiError } from "@/lib/server/osu-api";
-import { getValidAccessToken } from "@/lib/server/osu-session";
-import {
-  getStoredSession,
-  updateStoredSessionSnapshot
-} from "@/lib/server/session-store";
 
 export async function POST() {
-  const sessionId = await readSessionIdFromCookies();
+  const session = await readSessionFromCookies();
 
-  if (!sessionId) {
+  if (!session) {
     return NextResponse.json({ error: "You need to sign in before syncing." }, { status: 401 });
   }
 
-  const session = getStoredSession(sessionId);
-
-  if (!session) {
-    return NextResponse.json({ error: "Your session expired. Sign in again." }, { status: 401 });
-  }
-
   try {
-    const accessToken = await getValidAccessToken(sessionId);
-
-    if (!accessToken) {
-      return NextResponse.json({ error: "Your session expired. Sign in again." }, { status: 401 });
-    }
-
-    let friends;
-
-    try {
-      friends = await fetchFriends(accessToken);
-    } catch (error) {
-      if (!(error instanceof OsuApiError) || error.status !== 401 || !session.refreshToken) {
-        throw error;
-      }
-
-      const refreshedAccessToken = await getValidAccessToken(sessionId, { forceRefresh: true });
-
-      if (!refreshedAccessToken) {
-        return NextResponse.json({ error: "Your session expired. Sign in again." }, { status: 401 });
-      }
-
-      friends = await fetchFriends(refreshedAccessToken);
-    }
-
+    const friends = await fetchFriends(session.accessToken);
     const snapshot = buildFriendSnapshot(session.viewer, friends);
+    const updatedSession = {
+      ...session,
+      snapshot,
+      updatedAt: new Date().toISOString()
+    };
 
-    updateStoredSessionSnapshot(sessionId, snapshot);
-
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       syncedAt: snapshot.syncedAt,
       totals: snapshot.totals
     });
+
+    applySessionCookie(response, updatedSession);
+
+    return response;
   } catch (error) {
     if (error instanceof OsuApiError && error.status === 401) {
       return NextResponse.json(

@@ -13,7 +13,6 @@ import {
   toOsuViewer
 } from "@/lib/server/osu-api";
 import { buildHomeUrl } from "@/lib/server/redirects";
-import { createStoredSession } from "@/lib/server/session-store";
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -37,17 +36,22 @@ export async function GET(request: Request) {
     const viewer = toOsuViewer(await fetchOwnProfile(token.access_token));
     const friends = await fetchFriends(token.access_token);
     const snapshot = buildFriendSnapshot(viewer, friends);
-    const session = createStoredSession({
+    const now = new Date().toISOString();
+
+    const session = {
       accessToken: token.access_token,
       accessTokenExpiresAt: getTokenExpiryTimestamp(token.expires_in),
+      createdAt: now,
+      id: crypto.randomUUID(),
       refreshToken: token.refresh_token,
       snapshot,
+      updatedAt: now,
       viewer
-    });
+    };
 
     const response = NextResponse.redirect(new URL("/", request.url));
 
-    applySessionCookie(response, session.id);
+    applySessionCookie(response, session);
     clearOAuthStateCookie(response);
 
     return response;
