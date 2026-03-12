@@ -31,10 +31,10 @@ export function CountryBreakdownList({
             onClick={() => onSelectCountry(country.code)}
             type="button"
           >
-            <span className="country-breakdown-row__rank">{index + 1}</span>
+            <span className="country-breakdown-row__rank">{countryCodeToFlag(country.code)}</span>
             <div className="country-breakdown-row__body">
               <div className="country-breakdown-row__meta">
-                <strong>{countryCodeToFlag(country.code)} {getCountryDisplayName(country.code, locale)}</strong>
+                <strong>{getCountryDisplayName(country.code, locale)}</strong>
                 <span>{country.count}</span>
               </div>
               <span

@@ -91,6 +91,7 @@ export function MapDashboard({
           <LeftDrawer
             authMessage={authMessage}
             demoMode={demoMode}
+            onSelectCountry={handleSelectCountry}
             snapshot={snapshot}
             viewer={viewer}
           />

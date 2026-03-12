@@ -43,25 +43,25 @@ function demoFriend(
 
 const DEMO_FRIENDS: OsuFriend[] = [
   // japan — main mascots
-  demoFriend(100001, "pippi", "JP", 1200, { osu: 1200, taiko: 800 }),
-  demoFriend(100002, "Mocha", "JP", 4500, { osu: 4500, taiko: 1200 }),
-  demoFriend(100003, "Yuzu", "JP", 12000, { osu: 12000, fruits: 3400 }),
-  demoFriend(100004, "Don", "JP", 28000, { taiko: 500 }),
+  demoFriend(14056601, "pippi", "JP", 1200, { osu: 1200, taiko: 800 }),
+  demoFriend(14056601, "Mocha", "JP", 4500, { osu: 4500, taiko: 1200 }),
+  demoFriend(14056601, "Yuzu", "JP", 12000, { osu: 12000, fruits: 3400 }),
+  demoFriend(14056601, "Don", "JP", 28000, { taiko: 500 }),
 
   // south korea — mania twins
-  demoFriend(100005, "Mani", "KR", 650, { osu: 650, mania: 420 }),
-  demoFriend(100006, "Mari", "KR", 7800, { osu: 7800, mania: 1900 }),
+  demoFriend(14056601, "Mani", "KR", 650, { osu: 650, mania: 420 }),
+  demoFriend(14056601, "Mari", "KR", 7800, { osu: 7800, mania: 1900 }),
 
   // community mascots spread across countries
-  demoFriend(100007, "Aiko", "US", 3200, { osu: 3200, taiko: 6500 }),
-  demoFriend(100008, "Alisa", "DE", 5600, { osu: 5600, mania: 7200 }),
-  demoFriend(100009, "Chirou", "PH", 2100, { osu: 2100, taiko: 4300 }),
-  demoFriend(100010, "Taikonator", "AU", 9800, { osu: 9800, taiko: 1400 }),
-  demoFriend(100011, "Tama", "BR", 6300, { osu: 6300, taiko: 2800 }),
+  demoFriend(14056601, "Aiko", "US", 3200, { osu: 3200, taiko: 6500 }),
+  demoFriend(14056601, "Alisa", "DE", 5600, { osu: 5600, mania: 7200 }),
+  demoFriend(14056601, "Chirou", "PH", 2100, { osu: 2100, taiko: 4300 }),
+  demoFriend(14056601, "Taikonator", "AU", 9800, { osu: 9800, taiko: 1400 }),
+  demoFriend(14056601, "Tama", "BR", 6300, { osu: 6300, taiko: 2800 }),
 
   // legacy mascots
-  demoFriend(100012, "Ryūta", "CA", 11000, { osu: 11000, fruits: 2100 }),
-  demoFriend(100013, "Agent J", "GB", 7400, { osu: 7400 }),
+  demoFriend(14056601, "Ryūta", "CA", 11000, { osu: 11000, fruits: 2100 }),
+  demoFriend(14056601, "Agent J", "GB", 7400, { osu: 7400 }),
 ];
 
 export function createDemoSnapshot(): FriendSnapshot {

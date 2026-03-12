@@ -16,7 +16,11 @@ export function normalizeCountryCode(countryCode: string | null) {
 }
 
 // converts a 2-letter country code to its flag emoji via regional indicator symbols
-export function countryCodeToFlag(code: string): string {
+export function countryCodeToFlag(code: string | null): string {
+  if (!code) {
+    return "";
+  }
+
   const upper = code.toUpperCase();
 
   if (upper.length !== 2) {

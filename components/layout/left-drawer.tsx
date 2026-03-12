@@ -7,6 +7,7 @@ const DEFAULT_AVATAR = "https://osu.ppy.sh/images/layout/avatar-guest@2x.png";
 type LeftDrawerProps = {
   authMessage: string | null;
   demoMode: boolean;
+  onSelectCountry: (code: string) => void;
   snapshot: FriendSnapshot;
   viewer: OsuViewer | null;
 };
@@ -22,6 +23,7 @@ const MODE_LABELS: Record<OsuGameMode, string> = {
 export function LeftDrawer({
   authMessage,
   demoMode,
+  onSelectCountry,
   snapshot,
   viewer
 }: Readonly<LeftDrawerProps>) {
@@ -110,7 +112,12 @@ export function LeftDrawer({
           </div>
 
           <div className="left-drawer__country-strip">
-            <article className="left-drawer__country-pill">
+            <button
+              className="left-drawer__country-pill"
+              disabled={!topCountry}
+              onClick={() => topCountry && onSelectCountry(topCountry.code)}
+              type="button"
+            >
               <span className="left-drawer__country-pill-label">{t.top}</span>
               <strong>{topCountry ? `${countryCodeToFlag(topCountry.code)} ${topCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta">
@@ -118,9 +125,15 @@ export function LeftDrawer({
                   ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
                   : "—"}
               </span>
-            </article>
+            </button>
 
-            <article className="left-drawer__country-pill" data-tone="accent">
+            <button
+              className="left-drawer__country-pill"
+              data-tone="accent"
+              disabled={!rarestCountry}
+              onClick={() => rarestCountry && onSelectCountry(rarestCountry.code)}
+              type="button"
+            >
               <span className="left-drawer__country-pill-label">{t.rarest}</span>
               <strong>{rarestCountry ? `${countryCodeToFlag(rarestCountry.code)} ${rarestCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta">
@@ -128,25 +141,43 @@ export function LeftDrawer({
                   ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`
                   : "—"}
               </span>
-            </article>
+            </button>
           </div>
         </section>
 
         <section className="widget-grid left-drawer__mode-grid">
-          {modeCards.map((card) => (
-            <article
-              className="widget-card widget-card--metric mode-rank-card"
-              key={card.mode}
-            >
-              <span className="widget-card__label">{card.label}</span>
-              <strong>{card.friend?.username ?? "—"}</strong>
-              {card.rank !== null ? (
-                <span className="mode-rank-card__rank">#{card.rank.toLocaleString()}</span>
-              ) : (
-                <span className="widget-card__subcopy">—</span>
-              )}
-            </article>
-          ))}
+          {modeCards.map((card) => {
+            const content = (
+              <>
+                <span className="widget-card__label">{card.label}</span>
+                <strong>{card.friend?.username ?? "—"}</strong>
+                {card.rank !== null ? (
+                  <span className="mode-rank-card__rank">#{card.rank.toLocaleString()}</span>
+                ) : (
+                  <span className="widget-card__subcopy">—</span>
+                )}
+              </>
+            );
+
+            return card.friend ? (
+              <a
+                className="widget-card widget-card--metric mode-rank-card"
+                href={`https://osu.ppy.sh/users/${card.friend.osuId}`}
+                key={card.mode}
+                rel="noreferrer"
+                target="_blank"
+              >
+                {content}
+              </a>
+            ) : (
+              <article
+                className="widget-card widget-card--metric mode-rank-card"
+                key={card.mode}
+              >
+                {content}
+              </article>
+            );
+          })}
         </section>
 
         {authMessage ? (

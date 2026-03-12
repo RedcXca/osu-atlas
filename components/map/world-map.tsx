@@ -272,7 +272,7 @@ export function WorldMap({
 
           {focusedCountry ? (
             <div className="map-focus-card">
-              <strong>{countryCodeToFlag(focusedCountry.code)} {getCountryDisplayName(focusedCountry.code, locale)}</strong>
+              <strong>{countryCodeToFlag(focusedCountry.code ?? "")} {getCountryDisplayName(focusedCountry.code ?? "", locale)}</strong>
               <p>
                 {t.friendCount(focusedCountry.count)}
               </p>
