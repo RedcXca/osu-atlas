@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { LanguageSelector } from "@/components/layout/language-selector";
 import { APP_ROUTES } from "@/lib/config/routes";
 import { useLanguage } from "@/lib/i18n/context";
@@ -9,6 +10,34 @@ type SiteHeaderProps = {
 
 export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
   const { t } = useLanguage();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setMenuOpen(false);
+      }
+    }
+
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [menuOpen]);
 
   return (
     <header className="site-header panel">
@@ -37,22 +66,51 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
       <div className="site-header__actions">
         <LanguageSelector />
         {viewer ? (
-          <div className="site-header__user">
-            <img
-              alt={viewer.username}
-              className="site-header__avatar"
-              height={52}
-              src={viewer.avatarUrl}
-              width={52}
-            />
-            <div className="site-header__account">
+          <div className="profile-menu" ref={menuRef}>
+            <button
+              className="profile-menu__trigger"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              type="button"
+            >
+              <img
+                alt={viewer.username}
+                className="site-header__avatar"
+                height={42}
+                src={viewer.avatarUrl}
+                width={42}
+              />
               <strong>{viewer.username}</strong>
-              <span className="site-header__session-label">osu!</span>
-            </div>
+              <svg className="profile-menu__chevron" data-open={menuOpen} fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="16">
+                <polyline points="6 9 12 15 18 9" />
+              </svg>
+            </button>
+
+            {menuOpen ? (
+              <div className="profile-menu__panel">
+                <a
+                  className="profile-menu__item"
+                  href={`https://osu.ppy.sh/users/${viewer.osuId}`}
+                  rel="noreferrer"
+                  target="_blank"
+                >
+                  {t.profile}
+                </a>
+                <a className="profile-menu__item profile-menu__item--danger" href={APP_ROUTES.logout}>
+                  Logout
+                </a>
+              </div>
+            ) : null}
           </div>
         ) : (
-          <a className="login-button" href={APP_ROUTES.osuLogin}>
-            {t.loginWithOsu}
+          <a className="profile-menu__trigger" href={APP_ROUTES.osuLogin}>
+            <img
+              alt="demo"
+              className="site-header__avatar"
+              height={42}
+              src="https://osu.ppy.sh/images/layout/avatar-guest@2x.png"
+              width={42}
+            />
+            <strong>{t.loginWithOsu}</strong>
           </a>
         )}
       </div>
