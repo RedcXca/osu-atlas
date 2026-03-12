@@ -196,14 +196,14 @@ img {
   font-size: 0.9rem;
   font-weight: 600;
   text-decoration: none;
-  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+  transition: background 140ms ease, border-color 140ms ease;
   white-space: nowrap;
 }
 
 .login-button:hover {
   background: var(--bg-elevated);
   border-color: var(--muted);
-  transform: translateY(-1px);
+
 }
 
 .profile-menu {
@@ -503,12 +503,12 @@ img {
   color: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease;
 }
 
 .left-drawer__country-pill:hover:not(:disabled) {
   border-color: var(--accent);
-  transform: translateY(-1px);
+
 }
 
 .left-drawer__country-pill:disabled {
@@ -626,12 +626,12 @@ img {
   min-height: 98px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease;
 }
 
 a.mode-rank-card:hover {
   border-color: var(--accent);
-  transform: translateY(-1px);
+
 }
 
 .mode-rank-card strong {
@@ -762,7 +762,7 @@ a.mode-rank-card:hover {
 }
 
 .button:hover {
-  transform: translateY(-1px);
+
   border-color: var(--accent);
 }
 
@@ -926,7 +926,7 @@ a.mode-rank-card:hover {
   cursor: pointer;
   font-size: 0.92rem;
   font-weight: 800;
-  transition: border-color 140ms ease, color 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease, color 140ms ease;
 }
 
 .map-control:hover,
@@ -934,7 +934,7 @@ a.mode-rank-card:hover {
   border-color: var(--accent);
   color: #fff;
   outline: none;
-  transform: translateY(-1px);
+
 }
 
 .map-control--reset {
@@ -1140,14 +1140,14 @@ a.mode-rank-card:hover {
   background: #120f15;
   color: var(--text);
   text-align: left;
-  transition: border-color 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease;
 }
 
 .sort-accordion__trigger:hover,
 .sort-accordion__trigger:focus-visible {
   border-color: var(--accent);
   outline: none;
-  transform: translateY(-1px);
+
 }
 
 .sort-accordion__value {
@@ -1246,7 +1246,7 @@ a.mode-rank-card:hover {
   border-color: var(--accent);
   background: linear-gradient(180deg, rgba(255, 102, 170, 0.08), rgba(0, 0, 0, 0.12));
   outline: none;
-  transform: translateY(-1px);
+
 }
 
 .country-breakdown-row__rank {
@@ -1324,14 +1324,14 @@ a.mode-rank-card:hover {
   background: rgba(17, 13, 19, 0.6);
   color: var(--text);
   cursor: pointer;
-  transition: border-color 140ms ease, transform 140ms ease;
+  transition: border-color 140ms ease;
 }
 
 .language-selector__trigger:hover,
 .language-selector__trigger:focus-visible {
   border-color: var(--accent);
   outline: none;
-  transform: translateY(-1px);
+
 }
 
 .language-selector__globe {
