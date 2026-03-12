@@ -4,10 +4,8 @@ import {
   clearOAuthStateCookie,
   readOAuthStateFromCookies
 } from "@/lib/server/cookies";
-import { buildFriendSnapshot } from "@/lib/domain/friend-snapshot";
 import {
   exchangeAuthorizationCode,
-  fetchFriends,
   fetchOwnProfile,
   getTokenExpiryTimestamp,
   toOsuViewer
@@ -34,24 +32,15 @@ export async function GET(request: Request) {
   try {
     const token = await exchangeAuthorizationCode(code);
     const viewer = toOsuViewer(await fetchOwnProfile(token.access_token));
-    const friends = await fetchFriends(token.access_token);
-    const snapshot = buildFriendSnapshot(viewer, friends);
-    const now = new Date().toISOString();
-
-    const session = {
-      accessToken: token.access_token,
-      accessTokenExpiresAt: getTokenExpiryTimestamp(token.expires_in),
-      createdAt: now,
-      id: crypto.randomUUID(),
-      refreshToken: token.refresh_token,
-      snapshot,
-      updatedAt: now,
-      viewer
-    };
 
     const response = NextResponse.redirect(new URL("/", request.url));
 
-    applySessionCookie(response, session);
+    applySessionCookie(response, {
+      accessToken: token.access_token,
+      accessTokenExpiresAt: getTokenExpiryTimestamp(token.expires_in),
+      refreshToken: token.refresh_token,
+      viewer
+    });
     clearOAuthStateCookie(response);
 
     return response;

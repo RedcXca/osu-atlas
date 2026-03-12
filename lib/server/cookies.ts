@@ -1,15 +1,18 @@
 import "server-only";
 
-import { deflateSync, inflateSync } from "node:zlib";
 import { cookies } from "next/headers";
 import type { NextResponse } from "next/server";
-import type { StoredSession } from "@/lib/models";
+import type { OsuViewer } from "@/lib/models";
 
 export const OAUTH_STATE_COOKIE_NAME = "osu_friends_map_oauth_state";
+const SESSION_COOKIE_NAME = "osu_friends_map_session";
 
-// session data is compressed + chunked across multiple cookies
-const SESSION_COOKIE_PREFIX = "osu_sess_";
-const CHUNK_SIZE = 3500;
+type SessionCookieData = {
+  accessToken: string;
+  accessTokenExpiresAt: string | null;
+  refreshToken?: string;
+  viewer: OsuViewer;
+};
 
 const BASE_COOKIE_OPTIONS = {
   httpOnly: true,
@@ -44,52 +47,32 @@ export async function readOAuthStateFromCookies() {
   return cookieStore.get(OAUTH_STATE_COOKIE_NAME)?.value ?? null;
 }
 
-// --- session (compressed + chunked) ---
+// --- session (tokens + viewer only) ---
 
-function compressSession(session: StoredSession): string {
-  const json = JSON.stringify(session);
-  const compressed = deflateSync(Buffer.from(json, "utf-8"));
-  return compressed.toString("base64");
-}
+export function applySessionCookie(response: NextResponse, data: SessionCookieData) {
+  const value = Buffer.from(JSON.stringify(data)).toString("base64");
 
-function decompressSession(encoded: string): StoredSession | null {
-  try {
-    const compressed = Buffer.from(encoded, "base64");
-    const json = inflateSync(compressed).toString("utf-8");
-    return JSON.parse(json) as StoredSession;
-  } catch {
-    return null;
-  }
-}
-
-export function applySessionCookie(response: NextResponse, session: StoredSession) {
-  const encoded = compressSession(session);
-  const chunkCount = Math.ceil(encoded.length / CHUNK_SIZE);
-
-  // write chunks
-  for (let i = 0; i < chunkCount; i++) {
-    response.cookies.set({
-      ...BASE_COOKIE_OPTIONS,
-      name: `${SESSION_COOKIE_PREFIX}${i}`,
-      value: encoded.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE)
-    });
-  }
-
-  // store chunk count so we know how many to read
   response.cookies.set({
     ...BASE_COOKIE_OPTIONS,
-    name: `${SESSION_COOKIE_PREFIX}n`,
-    value: String(chunkCount)
+    name: SESSION_COOKIE_NAME,
+    value
   });
 }
 
 export function clearSessionCookie(response: NextResponse) {
-  // clear up to 20 chunks (more than enough)
+  response.cookies.set({
+    ...BASE_COOKIE_OPTIONS,
+    maxAge: 0,
+    name: SESSION_COOKIE_NAME,
+    value: ""
+  });
+
+  // clean up old chunked cookies from previous implementation
   for (let i = 0; i < 20; i++) {
     response.cookies.set({
       ...BASE_COOKIE_OPTIONS,
       maxAge: 0,
-      name: `${SESSION_COOKIE_PREFIX}${i}`,
+      name: `osu_sess_${i}`,
       value: ""
     });
   }
@@ -97,36 +80,23 @@ export function clearSessionCookie(response: NextResponse) {
   response.cookies.set({
     ...BASE_COOKIE_OPTIONS,
     maxAge: 0,
-    name: `${SESSION_COOKIE_PREFIX}n`,
+    name: "osu_sess_n",
     value: ""
   });
 }
 
-export async function readSessionFromCookies(): Promise<StoredSession | null> {
+export async function readSessionFromCookies(): Promise<SessionCookieData | null> {
   const cookieStore = await cookies();
-  const countCookie = cookieStore.get(`${SESSION_COOKIE_PREFIX}n`);
+  const cookie = cookieStore.get(SESSION_COOKIE_NAME);
 
-  if (!countCookie?.value) {
+  if (!cookie?.value) {
     return null;
   }
 
-  const chunkCount = parseInt(countCookie.value, 10);
-
-  if (isNaN(chunkCount) || chunkCount < 1) {
+  try {
+    const json = Buffer.from(cookie.value, "base64").toString("utf-8");
+    return JSON.parse(json) as SessionCookieData;
+  } catch {
     return null;
   }
-
-  let encoded = "";
-
-  for (let i = 0; i < chunkCount; i++) {
-    const chunk = cookieStore.get(`${SESSION_COOKIE_PREFIX}${i}`);
-
-    if (!chunk?.value) {
-      return null;
-    }
-
-    encoded += chunk.value;
-  }
-
-  return decompressSession(encoded);
 }
