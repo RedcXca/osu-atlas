@@ -184,6 +184,42 @@ img {
   gap: 14px;
 }
 
+.login-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 20px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--bg-panel-strong);
+  color: var(--muted-strong);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 140ms ease, border-color 140ms ease, transform 140ms ease;
+  white-space: nowrap;
+}
+
+.login-button:hover {
+  background: var(--bg-elevated);
+  border-color: var(--muted);
+  transform: translateY(-1px);
+}
+
+.login-button--full {
+  width: 100%;
+  justify-content: center;
+  padding: 10px 20px;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.login-button--full:hover {
+  background: var(--accent-soft-strong);
+  border-color: var(--accent);
+}
+
 .site-header__user {
   display: flex;
   align-items: center;

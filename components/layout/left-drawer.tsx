@@ -1,4 +1,5 @@
 import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
+import { APP_ROUTES } from "@/lib/config/routes";
 import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
 
@@ -99,6 +100,12 @@ export function LeftDrawer({
               ) : null}
             </div>
           </div>
+
+          {demoMode ? (
+            <a className="login-button login-button--full" href={APP_ROUTES.osuLogin}>
+              {t.loginWithOsu}
+            </a>
+          ) : null}
 
           <div className="stat-grid left-drawer__stat-grid">
             <article className="stat-card left-drawer__stat-card">

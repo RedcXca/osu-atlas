@@ -1,4 +1,6 @@
 import { LanguageSelector } from "@/components/layout/language-selector";
+import { APP_ROUTES } from "@/lib/config/routes";
+import { useLanguage } from "@/lib/i18n/context";
 import type { OsuViewer } from "@/lib/models";
 
 type SiteHeaderProps = {
@@ -6,6 +8,8 @@ type SiteHeaderProps = {
 };
 
 export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
+  const { t } = useLanguage();
+
   return (
     <header className="site-header panel">
       <div className="site-header__identity">
@@ -46,7 +50,11 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
               <span className="site-header__session-label">osu!</span>
             </div>
           </div>
-        ) : null}
+        ) : (
+          <a className="login-button" href={APP_ROUTES.osuLogin}>
+            {t.loginWithOsu}
+          </a>
+        )}
       </div>
     </header>
   );
