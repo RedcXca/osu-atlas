@@ -1375,13 +1375,36 @@ a.mode-rank-card:hover {
 }
 
 @media (max-width: 860px) {
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
   .page-shell {
+    height: auto;
+    min-height: 100vh;
     padding: 14px;
+    overflow: visible;
+  }
+
+  .page-layout {
+    height: auto;
+    min-height: 0;
   }
 
   .dashboard-grid {
+    height: auto;
     grid-template-columns: 1fr;
-    overflow: auto;
+    overflow: visible;
+  }
+
+  .left-drawer .drawer__body {
+    overflow: visible;
+  }
+
+  .map-panel {
+    min-height: 400px;
   }
 
   .drawer__body,
@@ -1391,7 +1414,7 @@ a.mode-rank-card:hover {
 
   .map-frame,
   .map-svg {
-    min-height: 520px;
+    min-height: 400px;
   }
 
   .map-focus-card {
@@ -1404,6 +1427,10 @@ a.mode-rank-card:hover {
   .map-footer {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .right-drawer {
+    min-height: 300px;
   }
 }
 
