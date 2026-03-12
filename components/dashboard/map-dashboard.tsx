@@ -15,6 +15,7 @@ import type {
   WorldMapCountry
 } from "@/lib/models";
 
+
 type MapDashboardProps = {
   authMessage: string | null;
   demoMode: boolean;

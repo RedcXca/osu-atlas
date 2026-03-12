@@ -776,7 +776,7 @@ img {
 .map-controls {
   position: absolute;
   top: 18px;
-  inset-inline-start: 18px;
+  left: 18px;
   z-index: 4;
   display: inline-flex;
   gap: 8px;
@@ -827,7 +827,7 @@ img {
 .map-focus-card {
   position: absolute;
   top: 18px;
-  inset-inline-end: 18px;
+  right: 18px;
   z-index: 2;
   width: min(220px, calc(100% - 36px));
   padding: 12px 14px;
@@ -893,7 +893,7 @@ img {
 
 .map-footer {
   position: absolute;
-  inset-inline-end: 18px;
+  right: 18px;
   bottom: 18px;
   z-index: 2;
   display: flex;
@@ -1009,7 +1009,7 @@ img {
   padding: 0 12px;
   background: #120f15;
   color: var(--text);
-  text-align: start;
+  text-align: left;
   transition: border-color 140ms ease, transform 140ms ease;
 }
 
@@ -1042,7 +1042,7 @@ img {
 .sort-accordion__panel {
   position: absolute;
   top: calc(100% + 8px);
-  inset-inline-end: 0;
+  right: 0;
   z-index: 24;
   display: flex;
   min-width: max(100%, 152px);
@@ -1068,7 +1068,7 @@ img {
   padding: 0 10px;
   background: transparent;
   color: var(--muted-strong);
-  text-align: start;
+  text-align: left;
   transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
 }
 
@@ -1104,7 +1104,7 @@ img {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.08));
   color: var(--text);
   cursor: pointer;
-  text-align: start;
+  text-align: left;
   transition:
     border-color 140ms ease,
     transform 140ms ease,
@@ -1172,7 +1172,7 @@ img {
   position: absolute;
   top: 0;
   bottom: 0;
-  inset-inline-start: 0;
+  left: 0;
   width: var(--country-share);
   border-radius: inherit;
   background: linear-gradient(90deg, var(--accent), #ff9dc8);
@@ -1237,7 +1237,7 @@ img {
 .language-selector__panel {
   position: absolute;
   top: calc(100% + 8px);
-  inset-inline-end: 0;
+  right: 0;
   z-index: 24;
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1266,7 +1266,7 @@ img {
   background: transparent;
   color: var(--muted-strong);
   cursor: pointer;
-  text-align: start;
+  text-align: left;
   transition: border-color 140ms ease, background 140ms ease, color 140ms ease;
 }
 
@@ -1343,7 +1343,8 @@ img {
 
   .map-focus-card {
     top: 14px;
-    inset-inline: 14px;
+    right: 14px;
+    left: 14px;
     width: auto;
   }
 
@@ -1369,4 +1370,19 @@ img {
   .friend-card__link {
     grid-column: 1 / -1;
   }
+}
+
+/* rtl: keep structural layout ltr, let text content flow rtl */
+[dir="rtl"] .page-layout,
+[dir="rtl"] .site-header,
+[dir="rtl"] .dashboard-grid {
+  direction: ltr;
+}
+
+[dir="rtl"] .drawer__body,
+[dir="rtl"] .map-focus-card,
+[dir="rtl"] .map-unknown,
+[dir="rtl"] .language-selector__panel,
+[dir="rtl"] .sort-accordion__panel {
+  direction: rtl;
 }
