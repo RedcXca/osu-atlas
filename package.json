@@ -28,6 +28,6 @@
     "@types/topojson-client": "^3.1.5",
     "eslint": "^9.17.0",
     "eslint-config-next": "^15.0.0",
-    "typescript": "^5.7.2"
+    "typescript": "5.9.3"
   }
 }
