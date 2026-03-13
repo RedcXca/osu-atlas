@@ -11,6 +11,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.2",
     "d3-geo": "^3.1.1",
     "next": "^15.0.0",
     "react": "^19.0.0",
