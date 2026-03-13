@@ -4,6 +4,7 @@ import {
   clearOAuthStateCookie,
   readOAuthStateFromCookies
 } from "@/lib/server/cookies";
+import { recordSignIn } from "@/lib/server/analytics";
 import {
   exchangeAuthorizationCode,
   fetchOwnProfile,
@@ -32,6 +33,8 @@ export async function GET(request: Request) {
   try {
     const token = await exchangeAuthorizationCode(code);
     const viewer = toOsuViewer(await fetchOwnProfile(token.access_token));
+
+    recordSignIn(viewer.username);
 
     const response = NextResponse.redirect(new URL("/", request.url));
 
