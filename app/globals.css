@@ -957,6 +957,9 @@ a.mode-rank-card:hover {
   min-height: 0;
   position: relative;
   z-index: 1;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
 }
 
 .map-svg__backdrop {
