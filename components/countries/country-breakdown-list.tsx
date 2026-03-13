@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
+import { CountryFlag } from "@/components/ui/country-flag";
+import { getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { CountryFriendBucket } from "@/lib/models";
 
@@ -31,7 +32,7 @@ export function CountryBreakdownList({
             onClick={() => onSelectCountry(country.code)}
             type="button"
           >
-            <span className="country-breakdown-row__rank">{countryCodeToFlag(country.code)}</span>
+            <span className="country-breakdown-row__rank"><CountryFlag code={country.code} /></span>
             <div className="country-breakdown-row__body">
               <div className="country-breakdown-row__meta">
                 <strong suppressHydrationWarning>{getCountryDisplayName(country.code, locale)}</strong>

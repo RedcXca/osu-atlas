@@ -15,20 +15,3 @@ export function normalizeCountryCode(countryCode: string | null) {
   return countryCode ? countryCode.toUpperCase() : null;
 }
 
-// converts a 2-letter country code to its flag emoji via regional indicator symbols
-export function countryCodeToFlag(code: string | null): string {
-  if (!code) {
-    return "";
-  }
-
-  const upper = code.toUpperCase();
-
-  if (upper.length !== 2) {
-    return "";
-  }
-
-  return String.fromCodePoint(
-    upper.charCodeAt(0) + 0x1F1A5,
-    upper.charCodeAt(1) + 0x1F1A5
-  );
-}
