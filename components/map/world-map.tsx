@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
+import { CountryFlag } from "@/components/ui/country-flag";
+import { getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { WorldMapCountry } from "@/lib/models";
 
@@ -272,7 +273,7 @@ export function WorldMap({
 
           {focusedCountry ? (
             <div className="map-focus-card">
-              <strong>{countryCodeToFlag(focusedCountry.code ?? "")} {getCountryDisplayName(focusedCountry.code ?? "", locale)}</strong>
+              <strong><CountryFlag code={focusedCountry.code} /> {getCountryDisplayName(focusedCountry.code ?? "", locale)}</strong>
               <p>
                 {t.friendCount(focusedCountry.count)}
               </p>
