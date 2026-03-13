@@ -283,7 +283,6 @@ export function WorldMap({
           <svg
             aria-label={t.worldMap}
             className="map-svg"
-            draggable={false}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={(event) => finishDrag(event.pointerId, event.currentTarget)}
