@@ -21,7 +21,8 @@
   --radius-card: 10px;
   --radius-input: 8px;
   --radius-pill: 999px;
-  --font-body: Inter, "Arial", sans-serif;
+  --font-body: var(--font-dm-sans), "DM Sans", sans-serif;
+  --font-display: var(--font-plus-jakarta), "Plus Jakarta Sans", sans-serif;
 }
 
 * {
@@ -167,9 +168,11 @@ img {
 
 .site-header__title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: 2.15rem;
   font-weight: 800;
   line-height: 0.98;
+  letter-spacing: -0.02em;
 }
 
 .site-header__credit {
@@ -370,9 +373,11 @@ img {
 
 .drawer__title {
   margin: 0;
+  font-family: var(--font-display);
   font-size: clamp(1.45rem, 2vw, 2rem);
   font-weight: 800;
   line-height: 1.05;
+  letter-spacing: -0.015em;
   text-transform: lowercase;
 }
 
@@ -480,6 +485,7 @@ img {
 }
 
 .left-drawer__stat-card strong {
+  font-family: var(--font-display);
   font-size: 1.12rem;
 }
 
@@ -529,7 +535,9 @@ img {
 }
 
 .left-drawer__country-pill strong {
+  font-family: var(--font-display);
   font-size: 1.18rem;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
@@ -592,7 +600,9 @@ img {
 }
 
 .widget-card--metric strong {
+  font-family: var(--font-display);
   font-size: 1.3rem;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
@@ -650,6 +660,7 @@ a.mode-rank-card:hover {
 }
 
 .mode-rank-card__rank {
+  font-family: var(--font-display);
   font-size: 0.95rem;
   font-weight: 800;
   line-height: 1;
@@ -693,7 +704,9 @@ a.mode-rank-card:hover {
 }
 
 .profile-meta strong {
+  font-family: var(--font-display);
   font-size: 1.32rem;
+  letter-spacing: -0.01em;
   line-height: 1.02;
   overflow-wrap: anywhere;
 }
@@ -723,7 +736,9 @@ a.mode-rank-card:hover {
 .stat-card strong {
   display: block;
   margin-top: 6px;
+  font-family: var(--font-display);
   font-size: 1.45rem;
+  letter-spacing: -0.01em;
 }
 
 .input {
@@ -979,7 +994,9 @@ a.mode-rank-card:hover {
 .map-focus-card strong {
   display: block;
   margin-top: 0;
+  font-family: var(--font-display);
   font-size: 1.1rem;
+  letter-spacing: -0.01em;
 }
 
 .map-focus-card p {
@@ -1061,7 +1078,9 @@ a.mode-rank-card:hover {
 
 .country-header strong {
   display: block;
+  font-family: var(--font-display);
   font-size: 1.25rem;
+  letter-spacing: -0.01em;
 }
 
 .country-header span {
