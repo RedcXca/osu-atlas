@@ -1,5 +1,6 @@
-import { CountryFlag } from "@/components/ui/country-flag";
-import { getCountryDisplayName } from "@/lib/domain/countries";
+import { DataCorruption } from "@/components/fx/data-corruption";
+import { SoundtrackDock } from "@/components/fx/soundtrack-dock";
+import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
 
@@ -8,6 +9,7 @@ const DEFAULT_AVATAR = "https://osu.ppy.sh/images/layout/avatar-guest@2x.png";
 type LeftDrawerProps = {
   authMessage: string | null;
   demoMode: boolean;
+  onFriendSortModeChange: (mode: OsuGameMode) => void;
   onSelectCountry: (code: string) => void;
   snapshot: FriendSnapshot;
   viewer: OsuViewer | null;
@@ -24,6 +26,7 @@ const MODE_LABELS: Record<OsuGameMode, string> = {
 export function LeftDrawer({
   authMessage,
   demoMode,
+  onFriendSortModeChange,
   onSelectCountry,
   snapshot,
   viewer
@@ -89,10 +92,11 @@ export function LeftDrawer({
 
   return (
     <aside className="panel drawer left-drawer">
+      <div className="pulse-line" />
       <div className="drawer__body">
         <section className="hero-card left-drawer__hero">
           <div className="profile-row">
-            <img alt={displayName} height={64} src={displayAvatar} width={64} />
+            <img alt={displayName} height={48} src={displayAvatar} width={48} />
             <div className="profile-meta">
               <strong>{displayName}</strong>
             </div>
@@ -117,7 +121,7 @@ export function LeftDrawer({
               type="button"
             >
               <span className="left-drawer__country-pill-label">{t.top}</span>
-              <strong>{topCountry ? <><CountryFlag code={topCountry.code} size={16} /> {topCountry.code}</> : "—"}</strong>
+              <strong>{topCountry ? `${countryCodeToFlag(topCountry.code)} ${topCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta" suppressHydrationWarning>
                 {topCountry
                   ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
@@ -133,7 +137,7 @@ export function LeftDrawer({
               type="button"
             >
               <span className="left-drawer__country-pill-label">{t.rarest}</span>
-              <strong>{rarestCountry ? <><CountryFlag code={rarestCountry.code} size={16} /> {rarestCountry.code}</> : "—"}</strong>
+              <strong>{rarestCountry ? `${countryCodeToFlag(rarestCountry.code)} ${rarestCountry.code}` : "—"}</strong>
               <span className="left-drawer__country-pill-meta" suppressHydrationWarning>
                 {rarestCountry
                   ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`
@@ -143,7 +147,9 @@ export function LeftDrawer({
           </div>
         </section>
 
-        <h3 className="left-drawer__section-title">{t.topRanked}</h3>
+        <h3 className="left-drawer__section-title">
+          <DataCorruption text={t.topRanked} interval={10000} />
+        </h3>
         <section className="widget-grid left-drawer__mode-grid">
           {modeCards.map((card) => {
             const content = (
@@ -159,15 +165,19 @@ export function LeftDrawer({
             );
 
             return card.friend ? (
-              <a
+              <button
                 className="widget-card widget-card--metric mode-rank-card"
-                href={`https://osu.ppy.sh/users/${card.friend.osuId}`}
                 key={card.mode}
-                rel="noreferrer"
-                target="_blank"
+                onClick={() => {
+                  if (card.friend!.countryCode) {
+                    onSelectCountry(card.friend!.countryCode);
+                  }
+                  onFriendSortModeChange(card.mode);
+                }}
+                type="button"
               >
                 {content}
-              </a>
+              </button>
             ) : (
               <article
                 className="widget-card widget-card--metric mode-rank-card"
@@ -184,6 +194,8 @@ export function LeftDrawer({
             {authMessage}
           </section>
         ) : null}
+
+        <SoundtrackDock />
       </div>
     </aside>
   );

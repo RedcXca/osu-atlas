@@ -4,8 +4,17 @@ import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { LeftDrawer } from "@/components/layout/left-drawer";
 import { RightDrawer } from "@/components/layout/right-drawer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { WorldMap } from "@/components/map/world-map";
+import { AtlasGlobe } from "@/components/globe/atlas-globe";
+import { BootSequence } from "@/components/fx/boot-sequence";
+import { ChromaticAberration } from "@/components/fx/chromatic-aberration";
+import { CircuitOverlay } from "@/components/fx/circuit-overlay";
+import { FloatingMarquee } from "@/components/fx/floating-marquee";
+import { GithubToast } from "@/components/fx/github-toast";
+import { ScanLines } from "@/components/fx/scan-lines";
+import { UiSoundProvider } from "@/components/fx/ui-sound-provider";
+import { Vignette } from "@/components/fx/vignette";
 import { LanguageProvider } from "@/lib/i18n/context";
+import { playClick, playDeselect, playHover, playSelect } from "@/lib/audio/ui-sounds";
 import { sortCountryBuckets, sortFriends } from "@/lib/domain/friend-snapshot";
 import type {
   CountrySortMode,
@@ -33,6 +42,8 @@ export function MapDashboard({
 }: Readonly<MapDashboardProps>) {
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
+  const [bootEntered, setBootEntered] = useState(false);
+  const [globeReady, setGlobeReady] = useState(false);
   const [countrySortMode, setCountrySortMode] = useState<CountrySortMode>("count");
   const [friendSortMode, setFriendSortMode] = useState<FriendSortMode>("alphabetical");
   const [query, setQuery] = useState("");
@@ -80,44 +91,71 @@ export function MapDashboard({
   }, [friendSortMode, normalizedQuery, selectedCountry]);
 
   const handleSelectCountry = (code: string | null) => {
+    if (code) {
+      playSelect();
+    } else if (selectedCode) {
+      playDeselect();
+    }
     setSelectedCode(code);
+  };
+
+  const handleHoverCountry = (code: string | null) => {
+    if (code && code !== hoveredCode && globeReady) {
+      playHover();
+    }
+    setHoveredCode(code);
   };
 
   return (
     <LanguageProvider>
-      <div className="page-layout">
-        <SiteHeader viewer={viewer} />
-        <section className="dashboard-grid">
-          <LeftDrawer
-            authMessage={authMessage}
-            demoMode={demoMode}
-            onSelectCountry={handleSelectCountry}
-            snapshot={snapshot}
-            viewer={viewer}
-          />
-          <WorldMap
-            hoveredCode={hoveredCode}
-            mapCountries={mapCountries}
-            unknownCount={snapshot.countries.UNKNOWN?.count ?? 0}
-            onHoverChange={setHoveredCode}
-            onSelectCountry={handleSelectCountry}
-            selectedCode={selectedCode}
-          />
-          <RightDrawer
-            countries={visibleCountries}
-            countrySortMode={countrySortMode}
-            filteredFriends={visibleFriends}
-            onCountrySortModeChange={setCountrySortMode}
-            onFriendSortModeChange={setFriendSortMode}
-            onQueryChange={setQuery}
-            onSelectCountry={handleSelectCountry}
-            friendSortMode={friendSortMode}
-            query={query}
-            selectedCountry={selectedCountry}
-            totalFriends={snapshot.totals.friendCount}
-          />
-        </section>
-      </div>
+      <BootSequence onEnter={() => setBootEntered(true)}>
+        <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
+          <SiteHeader viewer={viewer} />
+          <section className="dashboard-grid">
+            <LeftDrawer
+              authMessage={authMessage}
+              demoMode={demoMode}
+              onFriendSortModeChange={setFriendSortMode}
+              onSelectCountry={handleSelectCountry}
+              snapshot={snapshot}
+              viewer={viewer}
+            />
+            <AtlasGlobe
+              bootEntered={bootEntered}
+              hoveredCode={hoveredCode}
+              mapCountries={mapCountries}
+              onGlobeReady={() => setGlobeReady(true)}
+              onHoverChange={handleHoverCountry}
+              onSelectCountry={handleSelectCountry}
+              selectedCode={selectedCode}
+            />
+            <RightDrawer
+              countries={visibleCountries}
+              countrySortMode={countrySortMode}
+              filteredFriends={visibleFriends}
+              onCountrySortModeChange={setCountrySortMode}
+              onFriendSortModeChange={setFriendSortMode}
+              onQueryChange={setQuery}
+              onSelectCountry={handleSelectCountry}
+              friendSortMode={friendSortMode}
+              query={query}
+              selectedCountry={selectedCountry}
+              totalFriends={snapshot.totals.friendCount}
+            />
+          </section>
+        </div>
+        <FloatingMarquee
+          friendCount={snapshot.totals.friendCount}
+          countryCount={snapshot.totals.countryCount}
+          username={viewer?.username ?? "demo"}
+        />
+        <GithubToast />
+        <UiSoundProvider />
+        <CircuitOverlay />
+        <ChromaticAberration />
+        <ScanLines />
+        <Vignette />
+      </BootSequence>
     </LanguageProvider>
   );
 }

@@ -1,4 +1,5 @@
 import { CountryBreakdownList } from "@/components/countries/country-breakdown-list";
+import { DataCorruption } from "@/components/fx/data-corruption";
 import { FriendList } from "@/components/friends/friend-list";
 import { SortAccordion } from "@/components/ui/sort-accordion";
 import { useLanguage } from "@/lib/i18n/context";
@@ -98,7 +99,7 @@ export function RightDrawer({
         ) : (
           <>
             <div className="toolbar-row toolbar-row--split">
-              <h2 className="drawer__title drawer__title--proper">{t.countries}</h2>
+              <h2 className="drawer__title"><DataCorruption text={t.countries} interval={12000} /></h2>
               <SortAccordion
                 label={t.sortCountries}
                 onChange={onCountrySortModeChange}

@@ -65,7 +65,7 @@ export function LanguageSelector() {
           <ellipse cx="8" cy="8" rx="2.8" ry="6" fill="none" stroke="currentColor" strokeWidth="1.4" />
           <path d="M2 8h12" fill="none" stroke="currentColor" strokeWidth="1.4" />
         </svg>
-        <span className="language-selector__value"><CountryFlag code={LOCALE_FLAGS[locale]} size={16} /> {LOCALE_LABELS[locale]}</span>
+        <span className="language-selector__value"><CountryFlag code={LOCALE_FLAGS[locale]} /> {LOCALE_LABELS[locale]}</span>
         <svg
           aria-hidden="true"
           className="language-selector__chevron"
@@ -102,7 +102,7 @@ export function LanguageSelector() {
               role="option"
               type="button"
             >
-              <CountryFlag code={option.flag} size={16} /> {option.label}
+              <CountryFlag code={option.flag} /> {option.label}
             </button>
           ))}
         </div>

@@ -26,15 +26,22 @@ export const metadata: Metadata = {
   },
   openGraph: {
     description: "See where your osu! friends are from.",
+    images: [{ url: "/og-preview.png", width: 1200, height: 630 }],
     siteName: "osu! Atlas",
     title: "osu! Atlas",
     type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    description: "See where your osu! friends are from.",
+    images: ["/og-preview.png"],
+    title: "osu! Atlas"
   },
   title: "osu! Atlas"
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ff66aa"
+  themeColor: "#0a0a0c"
 };
 
 export default function RootLayout({

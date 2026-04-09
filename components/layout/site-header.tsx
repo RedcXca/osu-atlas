@@ -1,8 +1,65 @@
 import { useEffect, useRef, useState } from "react";
+import { DataCorruption } from "@/components/fx/data-corruption";
 import { LanguageSelector } from "@/components/layout/language-selector";
 import { APP_ROUTES } from "@/lib/config/routes";
 import { useLanguage } from "@/lib/i18n/context";
 import type { OsuViewer } from "@/lib/models";
+
+const STATUS_CYCLE = [
+  "SYS.ONLINE", "UPLINK.OK", "SCAN.ACTIVE", "SYNC.READY", "NET.STABLE"
+];
+
+function HeaderHud() {
+  const [time, setTime] = useState("");
+  const [tick, setTick] = useState(0);
+  const [signal, setSignal] = useState(94);
+
+  useEffect(() => {
+    function update() {
+      const now = new Date();
+      setTime(now.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+    }
+    update();
+    const timer = setInterval(update, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  // cycle status + signal strength
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTick((t) => t + 1);
+      setSignal(88 + Math.floor(Math.random() * 11));
+    }, 3000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const status = STATUS_CYCLE[tick % STATUS_CYCLE.length];
+  const signalBars = Math.round((signal - 85) / 3);
+
+  return (
+    <div className="header-hud" aria-hidden="true">
+      {/* blinking status indicator */}
+      <span className="header-hud__dot" />
+      <span className="header-hud__item header-hud__status" key={status}>{status}</span>
+
+      <span className="header-hud__divider" />
+
+      {/* live clock with blinking colon */}
+      <span className="header-hud__item header-hud__time">{time}</span>
+
+      <span className="header-hud__divider" />
+
+      {/* signal strength bars */}
+      <span className="header-hud__signal">
+        {Array.from({ length: 5 }, (_, i) => (
+          <span key={i} className={`header-hud__bar ${i < signalBars ? "header-hud__bar--active" : ""}`} />
+        ))}
+      </span>
+      <span className="header-hud__item">{signal}%</span>
+
+    </div>
+  );
+}
 
 type SiteHeaderProps = {
   viewer: OsuViewer | null;
@@ -42,27 +99,26 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
   return (
     <header className="site-header panel">
       <div className="site-header__identity">
-        <a aria-label="osu! website" className="site-header__brand" href="https://osu.ppy.sh" target="_blank" rel="noopener noreferrer">
-          <img
-            alt="osu!"
-            className="site-header__logo"
-            height={54}
-            src="/brand-mark.svg"
-            width={54}
-          />
-        </a>
+        <img
+          alt="osu! Atlas"
+          className="site-header__logo"
+          height={54}
+          src="/brand-mark.svg"
+          width={54}
+        />
 
         <div className="site-header__meta">
-          <h1 className="site-header__title">osu! Atlas</h1>
+          <h1 className="site-header__title"><DataCorruption text="OSU! ATLAS" interval={14000} /></h1>
           <span className="site-header__credit">
             by{" "}
-            <a href="https://github.com/RedcXca" target="_blank" rel="noopener noreferrer">
+            <a href="https://osu.ppy.sh/users/RedcXca" target="_blank" rel="noopener noreferrer">
               RedcXca
             </a>
           </span>
         </div>
       </div>
 
+      <HeaderHud />
       <div className="site-header__actions">
         <LanguageSelector />
         {viewer ? (
