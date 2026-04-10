@@ -47,6 +47,7 @@ export function BootSequence({ children, onEnter, skip }: BootSequenceProps) {
     if (phase !== "waiting") return;
 
     function enter() {
+      playGlitch();
       try { window.dispatchEvent(new CustomEvent("nier-boot-enter")); } catch { /* ignore */ }
       onEnter?.();
       setPhase("glitch");
