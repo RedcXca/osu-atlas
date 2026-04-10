@@ -1,6 +1,6 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { LeftDrawer } from "@/components/layout/left-drawer";
 import { RightDrawer } from "@/components/layout/right-drawer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -41,33 +41,23 @@ export function MapDashboard({
   snapshot,
   viewer
 }: Readonly<MapDashboardProps>) {
+  const [hasWebGL] = useState(() => {
+    if (typeof document === "undefined") return true;
+    try {
+      const canvas = document.createElement("canvas");
+      return !!(canvas.getContext("webgl") || canvas.getContext("experimental-webgl"));
+    } catch {
+      return false;
+    }
+  });
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [hoveredCode, setHoveredCode] = useState<string | null>(null);
-  const [bootEntered, setBootEntered] = useState(false);
-  const [globeReady, setGlobeReady] = useState(false);
+  const [bootEntered, setBootEntered] = useState(!hasWebGL);
+  const [globeReady, setGlobeReady] = useState(!hasWebGL);
   const [countrySortMode, setCountrySortMode] = useState<CountrySortMode>("count");
   const [friendSortMode, setFriendSortMode] = useState<FriendSortMode>("alphabetical");
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
-  const webglSupported = useRef<boolean | null>(null);
-  const [webglChecked, setWebglChecked] = useState(false);
-
-  useEffect(() => {
-    try {
-      const canvas = document.createElement("canvas");
-      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-      webglSupported.current = gl !== null;
-    } catch {
-      webglSupported.current = false;
-    }
-    setWebglChecked(true);
-
-    // skip boot/globe-ready gate when falling back to SVG map
-    if (!webglSupported.current) {
-      setGlobeReady(true);
-      setBootEntered(true);
-    }
-  }, []);
 
   useEffect(() => {
     setQuery("");
@@ -140,7 +130,7 @@ export function MapDashboard({
               snapshot={snapshot}
               viewer={viewer}
             />
-            {webglChecked && webglSupported.current === false ? (
+            {!hasWebGL ? (
               <WorldMap
                 hoveredCode={hoveredCode}
                 mapCountries={mapCountries}
