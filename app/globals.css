@@ -2318,6 +2318,17 @@ button.mode-rank-card:hover {
   transition: border-color var(--transition-base), background var(--transition-base);
 }
 
+.soundtrack-dock__play {
+  padding: 0 6px;
+  font-size: 0.78rem;
+  min-width: 28px;
+}
+
+.soundtrack-dock__play:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
 .soundtrack-dock__mute {
   margin-left: auto;
   padding: 0 6px;

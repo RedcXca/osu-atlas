@@ -2,8 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 
-const SEARCH_QUERY = "NieR Automata Fortress of Lies";
-const ITUNES_URL = `https://itunes.apple.com/search?term=${encodeURIComponent(SEARCH_QUERY)}&media=music&limit=1`;
 const PLAYBACK_VOLUME = 0.15;
 
 type TrackInfo = {
@@ -17,13 +15,14 @@ type TrackInfo = {
 
 export function SoundtrackDock() {
   const audioRef = useRef<HTMLAudioElement>(null);
+  const pendingAutoplay = useRef(false);
   const [track, setTrack] = useState<TrackInfo | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
-    fetch(ITUNES_URL)
+    fetch("/api/itunes")
       .then((res) => res.json())
       .then((data) => {
         const result = data.results?.[0];
@@ -45,21 +44,26 @@ export function SoundtrackDock() {
 
   // on user enter: unlock audio immediately (user gesture), then play after map loads
   useEffect(() => {
-    function onBootEnter() {
-      const audio = audioRef.current;
-      if (!audio) return;
-
-      // unlock audio context with a silent play in the user gesture stack
+    function startPlayback(audio: HTMLAudioElement) {
       audio.volume = 0;
       audio.play().then(() => {
         audio.pause();
-        // now wait for the map to appear (~1.3s for glitch + fade)
         setTimeout(() => {
           audio.currentTime = 0;
           audio.volume = PLAYBACK_VOLUME;
           audio.play().catch(() => {});
         }, 1400);
       }).catch(() => {});
+    }
+
+    function onBootEnter() {
+      const audio = audioRef.current;
+      if (!audio) {
+        // track hasn't loaded yet — defer until the audio element mounts
+        pendingAutoplay.current = true;
+        return;
+      }
+      startPlayback(audio);
     }
 
     window.addEventListener("nier-boot-enter", onBootEnter);
@@ -75,9 +79,17 @@ export function SoundtrackDock() {
     }
   }, [isPlaying]);
 
+  // when track loads, fulfill any pending autoplay from boot-enter
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = PLAYBACK_VOLUME;
+    if (!track?.previewUrl) return;
+    const audio = audioRef.current;
+    if (!audio) return;
+    audio.volume = PLAYBACK_VOLUME;
+
+    if (pendingAutoplay.current) {
+      pendingAutoplay.current = false;
+      audio.currentTime = 0;
+      audio.play().catch(() => {});
     }
   }, [track]);
 
@@ -139,11 +151,29 @@ export function SoundtrackDock() {
             )}
             <div className="soundtrack-dock__info">
               <span className="soundtrack-dock__label">
-                {isPlaying ? (isMuted ? "muted" : "now playing") : fetchError ? "unavailable" : "soundtrack"}
+                {isPlaying ? (isMuted ? "muted" : "now playing") : fetchError ? "loading failed" : "soundtrack"}
               </span>
               <strong>{displayTrack.trackName}</strong>
               <span className="soundtrack-dock__meta">{displayTrack.artistName}</span>
             </div>
+            <button
+              className="soundtrack-dock__button soundtrack-dock__play"
+              onClick={handlePlayPause}
+              type="button"
+              aria-label={isPlaying ? "pause" : "play"}
+              disabled={!track?.previewUrl}
+            >
+              {isPlaying ? (
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+                  <rect x="3" y="2" width="4" height="12" rx="1" />
+                  <rect x="9" y="2" width="4" height="12" rx="1" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor">
+                  <path d="M4 2l10 6-10 6z" />
+                </svg>
+              )}
+            </button>
             <button
               className="soundtrack-dock__button soundtrack-dock__mute"
               onClick={() => setIsMuted((m) => !m)}
