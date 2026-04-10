@@ -1,6 +1,7 @@
 import { DataCorruption } from "@/components/fx/data-corruption";
 import { SoundtrackDock } from "@/components/fx/soundtrack-dock";
-import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
+import { CountryFlag } from "@/components/ui/country-flag";
+import { getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { FriendSnapshot, OsuFriend, OsuGameMode, OsuViewer } from "@/lib/models";
 
@@ -121,7 +122,7 @@ export function LeftDrawer({
               type="button"
             >
               <span className="left-drawer__country-pill-label">{t.top}</span>
-              <strong>{topCountry ? `${countryCodeToFlag(topCountry.code)} ${topCountry.code}` : "—"}</strong>
+              <strong>{topCountry ? <><CountryFlag code={topCountry.code} /> {topCountry.code}</> : "—"}</strong>
               <span className="left-drawer__country-pill-meta" suppressHydrationWarning>
                 {topCountry
                   ? `${getCountryDisplayName(topCountry.code, locale)} · ${topCountry.count}`
@@ -137,7 +138,7 @@ export function LeftDrawer({
               type="button"
             >
               <span className="left-drawer__country-pill-label">{t.rarest}</span>
-              <strong>{rarestCountry ? `${countryCodeToFlag(rarestCountry.code)} ${rarestCountry.code}` : "—"}</strong>
+              <strong>{rarestCountry ? <><CountryFlag code={rarestCountry.code} /> {rarestCountry.code}</> : "—"}</strong>
               <span className="left-drawer__country-pill-meta" suppressHydrationWarning>
                 {rarestCountry
                   ? `${getCountryDisplayName(rarestCountry.code, locale)} · ${rarestCountry.count}`

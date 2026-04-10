@@ -1,10 +1,8 @@
-// regional indicator emoji flag from a 2-letter country code
+// inline flag image tag from a 2-letter country code
 export function countryCodeToFlag(code: string): string {
   const upper = code.toUpperCase();
   if (upper.length !== 2) return "";
-  return String.fromCodePoint(
-    ...Array.from(upper).map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
-  );
+  return `<img src="https://flagcdn.com/${code.toLowerCase()}.svg" alt="${upper}" width="16" height="12" style="display:inline-block;vertical-align:middle" />`;
 }
 
 export function getCountryDisplayName(countryCode: string | null, locale = "en") {

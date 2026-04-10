@@ -3,24 +3,23 @@
 import { geoCentroid } from "d3-geo";
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ChromaticAberrationEffect, EffectComposer, EffectPass, GlitchEffect, RenderPass } from "postprocessing";
+import { ChromaticAberrationEffect, EffectComposer, EffectPass, RenderPass } from "postprocessing";
 import {
   BoxGeometry,
   BufferGeometry,
   CapsuleGeometry,
   CanvasTexture,
-  CylinderGeometry,
   Float32BufferAttribute,
   Group,
   Mesh,
   MeshBasicMaterial,
   Points,
   PointsMaterial,
-  SphereGeometry,
   Vector2
 } from "three";
 import { HudOverlay } from "@/components/fx/hud-overlay";
 import { SpaceBackground } from "@/components/fx/space-background";
+import { CountryFlag } from "@/components/ui/country-flag";
 import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { WorldMapCountry } from "@/lib/models";
@@ -104,7 +103,7 @@ export function AtlasGlobe({
   const [globeInstance, setGlobeInstance] = useState<any>(null);
   const frameRef = useRef<HTMLElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [cameraRotation, setCameraRotation] = useState({ x: 0, y: 0 });
+  const spaceBgRef = useRef<HTMLDivElement>(null);
   const autoRotateTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onGlobeReadyRef = useRef(onGlobeReady);
   onGlobeReadyRef.current = onGlobeReady;
@@ -225,8 +224,6 @@ export function AtlasGlobe({
       return;
     }
 
-    let frameId = 0;
-
     const syncDimensions = () => {
       const nextDimensions = {
         width: Math.round(element.getBoundingClientRect().width),
@@ -251,16 +248,10 @@ export function AtlasGlobe({
 
     observer.observe(element);
     syncDimensions();
-    const pollDimensions = () => {
-      syncDimensions();
-      frameId = requestAnimationFrame(pollDimensions);
-    };
-    frameId = requestAnimationFrame(pollDimensions);
     window.addEventListener("resize", syncDimensions);
 
     return () => {
       observer.disconnect();
-      cancelAnimationFrame(frameId);
       window.removeEventListener("resize", syncDimensions);
     };
   }, []);
@@ -290,12 +281,22 @@ export function AtlasGlobe({
       globe.pointOfView({ lat: 20, lng: 10, altitude: 0.01 });
     }
 
-    // track camera for CSS starfield parallax
+    // track camera for CSS starfield parallax — write directly to DOM, no React re-renders
     let frameId: number;
+    let lastX = 0;
+    let lastY = 0;
     const syncCamera = () => {
       const camera = globe.camera();
-      if (camera) {
-        setCameraRotation({ x: camera.position.y * 0.02, y: camera.position.x * 0.02 });
+      if (camera && spaceBgRef.current) {
+        const x = camera.position.y * 0.02;
+        const y = camera.position.x * 0.02;
+        // only touch the DOM when values actually change
+        if (Math.abs(x - lastX) > 0.01 || Math.abs(y - lastY) > 0.01) {
+          lastX = x;
+          lastY = y;
+          spaceBgRef.current.style.setProperty("--cam-x", `${x}`);
+          spaceBgRef.current.style.setProperty("--cam-y", `${y}`);
+        }
       }
       frameId = requestAnimationFrame(syncCamera);
     };
@@ -351,7 +352,7 @@ export function AtlasGlobe({
     const scene = globe.scene();
     if (!scene) return;
 
-    const starCount = 2400;
+    const starCount = 1600;
     const positions = new Float32Array(starCount * 3);
     const opacities = new Float32Array(starCount);
 
@@ -381,7 +382,7 @@ export function AtlasGlobe({
     scene.add(stars);
 
     // floating wireframe cubes scattered in space
-    const cubeCount = 40;
+    const cubeCount = 20;
     const cubeGroup = new Group();
     const cubeGeo = new BoxGeometry(1, 1, 1);
     const cubeMat = new MeshBasicMaterial({
@@ -429,14 +430,14 @@ export function AtlasGlobe({
     const susSolid = new MeshBasicMaterial({ color: 0xdad4cc, transparent: true, opacity: 0.06 });
 
     // body — chunky capsule
-    const bodyGeo = new CapsuleGeometry(2.0, 2.8, 12, 20);
+    const bodyGeo = new CapsuleGeometry(2.0, 2.8, 6, 10);
     const body = new Mesh(bodyGeo, susMat);
     const bodyFill = new Mesh(bodyGeo, susSolid);
     crewmate.add(body);
     crewmate.add(bodyFill);
 
     // visor — rounded box on front
-    const visorGeo = new CapsuleGeometry(1.1, 0.6, 8, 12);
+    const visorGeo = new CapsuleGeometry(1.1, 0.6, 4, 6);
     const visorMat = new MeshBasicMaterial({ color: 0xdad4cc, transparent: true, opacity: 0.3, wireframe: true });
     const visor = new Mesh(visorGeo, visorMat);
     visor.position.set(1.4, 0.9, 0);
@@ -444,7 +445,7 @@ export function AtlasGlobe({
     crewmate.add(visor);
 
     // backpack
-    const packGeo = new CapsuleGeometry(0.7, 1.6, 6, 10);
+    const packGeo = new CapsuleGeometry(0.7, 1.6, 4, 6);
     const pack = new Mesh(packGeo, susMat);
     const packFill = new Mesh(packGeo, susSolid);
     pack.position.set(-2.3, -0.3, 0);
@@ -453,7 +454,7 @@ export function AtlasGlobe({
     crewmate.add(packFill);
 
     // legs
-    const legGeo = new CapsuleGeometry(0.55, 1.0, 6, 10);
+    const legGeo = new CapsuleGeometry(0.55, 1.0, 4, 6);
     const leftLeg = new Mesh(legGeo, susMat);
     leftLeg.position.set(0.8, -3.2, 0);
     crewmate.add(leftLeg);
@@ -480,7 +481,7 @@ export function AtlasGlobe({
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 64, 64);
     const glowTexture = new CanvasTexture(glowCanvas);
-    const fgCount = 120;
+    const fgCount = 40;
     const fgPositions = new Float32Array(fgCount * 3);
 
     for (let i = 0; i < fgCount; i++) {
@@ -557,7 +558,7 @@ export function AtlasGlobe({
     };
   }, [globeInstance]);
 
-  // post-processing — chromatic aberration + glitch on the globe's own renderer
+  // post-processing — chromatic aberration only (no glitch — that was the heavy one)
   useEffect(() => {
     const globe = globeInstance ?? globeRef.current;
     if (!globe) return;
@@ -567,11 +568,8 @@ export function AtlasGlobe({
     const camera = globe.camera();
     if (!renderer || !scene || !camera) return;
 
-    const w = renderer.domElement.clientWidth;
-    const h = renderer.domElement.clientHeight;
-
     const composer = new EffectComposer(renderer);
-    composer.setSize(w, h);
+    composer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
     composer.addPass(new RenderPass(scene, camera));
 
     const chromaticAberration = new ChromaticAberrationEffect({
@@ -580,19 +578,8 @@ export function AtlasGlobe({
       modulationOffset: 0.2
     });
 
-    const glitch = new GlitchEffect({
-      delay: new Vector2(8, 16),
-      duration: new Vector2(0.02, 0.08),
-      strength: new Vector2(0.003, 0.012),
-      columns: 0.03,
-      ratio: 0.9
-    });
-
     composer.addPass(new EffectPass(camera, chromaticAberration));
-    composer.addPass(new EffectPass(camera, glitch));
 
-    // intercept the library's render — route through our composer
-    // guard prevents infinite recursion (composer internally calls renderer.render)
     const originalRender = renderer.render.bind(renderer);
     let composing = false;
     renderer.render = (...args: any[]) => {
@@ -610,6 +597,7 @@ export function AtlasGlobe({
       composer.dispose();
     };
   }, [globeInstance]);
+
 
   const resumeAutoRotate = useCallback(() => {
     if (autoRotateTimeout.current) {
@@ -681,12 +669,12 @@ export function AtlasGlobe({
           }
         }}
       >
-        <SpaceBackground cameraRotation={cameraRotation} />
+        <SpaceBackground ref={spaceBgRef} />
         <HudOverlay />
 
         {focusedCountry && focusedCountry.count > 0 ? (
           <div className="map-focus-card">
-            <strong>{countryCodeToFlag(focusedCountry.code ?? "")} {getCountryDisplayName(focusedCountry.code ?? "", locale)}</strong>
+            <strong><CountryFlag code={focusedCountry.code} /> {getCountryDisplayName(focusedCountry.code ?? "", locale)}</strong>
             <p>{t.friendCount(focusedCountry.count)}</p>
           </div>
         ) : null}
@@ -702,8 +690,8 @@ export function AtlasGlobe({
             height={dimensions.height}
             backgroundColor="rgba(0,0,0,0)"
             globeMaterial={globeMaterial}
-            atmosphereColor="rgba(200, 192, 184, 0.18)"
-            atmosphereAltitude={0.1}
+            atmosphereColor="rgba(210, 205, 200, 0.24)"
+            atmosphereAltitude={0.13}
             showGraticules={true}
             lineHoverPrecision={0.35}
             pointerEventsFilter={(_object: unknown, data: { kind?: string } | undefined) =>

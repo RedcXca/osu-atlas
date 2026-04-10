@@ -1,5 +1,3 @@
-import { countryCodeToFlag } from "@/lib/domain/countries";
-
 type CountryFlagProps = {
   code: string | null;
 };
@@ -9,5 +7,14 @@ export function CountryFlag({ code }: Readonly<CountryFlagProps>) {
     return null;
   }
 
-  return <span className="country-flag">{countryCodeToFlag(code)}</span>;
+  return (
+    <img
+      alt={code.toUpperCase()}
+      className="country-flag"
+      draggable={false}
+      height={12}
+      src={`https://flagcdn.com/${code.toLowerCase()}.svg`}
+      width={16}
+    />
+  );
 }
