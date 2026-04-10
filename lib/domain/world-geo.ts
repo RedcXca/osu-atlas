@@ -1,6 +1,6 @@
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { feature } from "topojson-client";
-import worldAtlas from "world-atlas/countries-110m.json";
+import worldAtlas from "world-atlas/countries-50m.json";
 import worldCountries from "world-countries";
 
 type AtlasCountryProperties = {
