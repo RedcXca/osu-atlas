@@ -1,11 +1,16 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useDeferredValue, useEffect, useMemo, useState } from "react";
 import { LeftDrawer } from "@/components/layout/left-drawer";
 import { RightDrawer } from "@/components/layout/right-drawer";
 import { SiteHeader } from "@/components/layout/site-header";
-import { AtlasGlobe } from "@/components/globe/atlas-globe";
 import { WorldMap } from "@/components/map/world-map";
+
+const AtlasGlobe = dynamic(
+  () => import("@/components/globe/atlas-globe").then((m) => m.AtlasGlobe),
+  { ssr: false }
+);
 import { BootSequence } from "@/components/fx/boot-sequence";
 import { ChromaticAberration } from "@/components/fx/chromatic-aberration";
 import { CircuitOverlay } from "@/components/fx/circuit-overlay";
