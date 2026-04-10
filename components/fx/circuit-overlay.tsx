@@ -134,9 +134,14 @@ export function CircuitOverlay() {
     resize();
     window.addEventListener("resize", resize);
 
+    // throttle to ~30fps to halve GPU cost
     let frameId: number;
+    let lastDraw = 0;
     function loop(time: number) {
-      draw(time);
+      if (time - lastDraw >= 33) {
+        draw(time);
+        lastDraw = time;
+      }
       frameId = requestAnimationFrame(loop);
     }
     frameId = requestAnimationFrame(loop);
