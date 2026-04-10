@@ -31,6 +31,9 @@ import {
 
 const Globe = dynamic(() => import("react-globe.gl"), { ssr: false });
 const MAX_ROUTE_DESTINATIONS = 24;
+const MAX_GLOBE_DISTANCE = 400;
+const MIN_CAMERA_NEAR = 0.01;
+const MIN_GLOBE_SURFACE_OFFSET = 10;
 
 type AtlasGlobeProps = {
   bootEntered?: boolean;
@@ -264,20 +267,23 @@ export function AtlasGlobe({
     }
 
     const controls = globe.controls();
+    const camera = globe.camera();
 
-    if (!controls) {
+    if (!controls || !camera) {
       return;
     }
 
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.28;
     controls.enableZoom = true;
-    controls.maxDistance = 420;
-
+    controls.minDistance = globe.getGlobeRadius() + MIN_GLOBE_SURFACE_OFFSET;
+    controls.maxDistance = MAX_GLOBE_DISTANCE;
+    camera.near = Math.min(camera.near, MIN_CAMERA_NEAR);
+    camera.far = Math.max(camera.far, MAX_GLOBE_DISTANCE * 3);
+    camera.updateProjectionMatrix();
     // only park on the surface once — subsequent re-runs must not reset the camera
     if (!hasInitialized.current) {
       hasInitialized.current = true;
-      controls.minDistance = 101;
       globe.pointOfView({ lat: 20, lng: 10, altitude: 0.01 });
     }
 
@@ -320,26 +326,11 @@ export function AtlasGlobe({
     // slow pull from surface to orbit
     globe.pointOfView({ lat: 20, lng: 10, altitude: 2.2 }, zoomDuration);
 
-    // smoothly raise minDistance so there's no snap at the end
-    const start = performance.now();
-    let frameId = 0;
-    const easeMinDistance = () => {
-      const progress = Math.min((performance.now() - start) / zoomDuration, 1);
-      if (controls) {
-        controls.minDistance = 101 + progress * (170 - 101);
-      }
-      if (progress < 1) {
-        frameId = requestAnimationFrame(easeMinDistance);
-      }
-    };
-    frameId = requestAnimationFrame(easeMinDistance);
-
     const readyTimer = setTimeout(() => {
       onGlobeReadyRef.current?.();
     }, zoomDuration);
 
     return () => {
-      cancelAnimationFrame(frameId);
       clearTimeout(readyTimer);
     };
   }, [bootEntered, globeInstance]);
@@ -427,42 +418,30 @@ export function AtlasGlobe({
     // sussy crewmate floating in space
     const crewmate = new Group();
     const susMat = new MeshBasicMaterial({ color: 0xdad4cc, transparent: true, opacity: 0.18, wireframe: true });
-    const susSolid = new MeshBasicMaterial({ color: 0xdad4cc, transparent: true, opacity: 0.06 });
 
-    // body — chunky capsule
-    const bodyGeo = new CapsuleGeometry(2.0, 2.8, 6, 10);
-    const body = new Mesh(bodyGeo, susMat);
-    const bodyFill = new Mesh(bodyGeo, susSolid);
-    crewmate.add(body);
-    crewmate.add(bodyFill);
+    const bodyGeo = new CapsuleGeometry(2.0, 2.8, 2, 4);
+    crewmate.add(new Mesh(bodyGeo, susMat));
 
-    // visor — rounded box on front
-    const visorGeo = new CapsuleGeometry(1.1, 0.6, 4, 6);
-    const visorMat = new MeshBasicMaterial({ color: 0xdad4cc, transparent: true, opacity: 0.3, wireframe: true });
-    const visor = new Mesh(visorGeo, visorMat);
+    const visorGeo = new CapsuleGeometry(0.9, 0.8, 2, 3);
+    const visor = new Mesh(visorGeo, susMat);
     visor.position.set(1.4, 0.9, 0);
     visor.rotation.z = Math.PI * 0.5;
     crewmate.add(visor);
 
-    // backpack
-    const packGeo = new CapsuleGeometry(0.7, 1.6, 4, 6);
+    const packGeo = new CapsuleGeometry(0.9, 1.8, 2, 3);
     const pack = new Mesh(packGeo, susMat);
-    const packFill = new Mesh(packGeo, susSolid);
     pack.position.set(-2.3, -0.3, 0);
-    packFill.position.copy(pack.position);
     crewmate.add(pack);
-    crewmate.add(packFill);
 
-    // legs
-    const legGeo = new CapsuleGeometry(0.55, 1.0, 4, 6);
+    const legGeo = new CapsuleGeometry(0.75, 1.0, 1, 3);
     const leftLeg = new Mesh(legGeo, susMat);
-    leftLeg.position.set(0.8, -3.2, 0);
+    leftLeg.position.set(1.0, -3.2, 0);
     crewmate.add(leftLeg);
     const rightLeg = new Mesh(legGeo, susMat);
-    rightLeg.position.set(-0.8, -3.2, 0);
+    rightLeg.position.set(-1.0, -3.2, 0);
     crewmate.add(rightLeg);
 
-    crewmate.scale.set(8, 8, 8);
+    crewmate.scale.set(5, 5, 5);
     crewmate.position.set(-400, 220, -350);
     crewmate.rotation.set(0.3, 0.5, 0.15);
     scene.add(crewmate);
@@ -547,9 +526,7 @@ export function AtlasGlobe({
       cubeMat.dispose();
       bodyGeo.dispose();
       susMat.dispose();
-      susSolid.dispose();
       visorGeo.dispose();
-      visorMat.dispose();
       packGeo.dispose();
       legGeo.dispose();
       glowTexture.dispose();
