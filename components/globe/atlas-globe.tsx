@@ -277,6 +277,12 @@ export function AtlasGlobe({
       return;
     }
 
+    // cap pixel ratio on weak hardware to reduce GPU load
+    const renderer = globe.renderer();
+    if (renderer && lowPerfMode) {
+      renderer.setPixelRatio(1);
+    }
+
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.28;
     controls.enableZoom = true;
@@ -731,7 +737,7 @@ export function AtlasGlobe({
 
               return getCountryStroke(count, isSelected);
             }}
-            polygonsTransitionDuration={180}
+            polygonsTransitionDuration={lowPerfMode ? 0 : 180}
             polygonLabel={(countryFeature: WorldGeoFeature) => {
               const code = getCountryCodeFromFeature(countryFeature);
 
@@ -771,7 +777,7 @@ export function AtlasGlobe({
 
               return 0.19 + intensity * 0.1;
             }}
-            pointsTransitionDuration={250}
+            pointsTransitionDuration={lowPerfMode ? 0 : 250}
             arcsData={routeArcs}
             arcColor={() => ["rgba(255, 255, 255, 0.68)", "rgba(255, 255, 255, 0.06)"]}
             arcDashAnimateTime={1800}
@@ -782,7 +788,7 @@ export function AtlasGlobe({
               `<div class="globe-tooltip">${arc.name}<br/><span>${t.friendCount(arc.count)}</span></div>`
             }
             arcStroke={(arc: GlobeRouteArc) => (arc.code === focusedCode ? 0.22 : 0.14)}
-            arcsTransitionDuration={600}
+            arcsTransitionDuration={lowPerfMode ? 0 : 600}
             onPolygonHover={(countryFeature: WorldGeoFeature | null) => {
               onHoverChange(countryFeature ? getCountryCodeFromFeature(countryFeature) : null);
             }}

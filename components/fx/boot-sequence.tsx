@@ -3,12 +3,16 @@
 import { useEffect, useState } from "react";
 import { playGlitch } from "@/lib/audio/ui-sounds";
 
-const BOOT_LINES = [
-  "[SYSTEM] Initializing terminal...",
-  "[SYSTEM] Loading geographic data...",
-  "[SYSTEM] Establishing connection to osu! network...",
-  "[SYSTEM] Operator interface ready."
-];
+function getBootLines(lowPerf: boolean) {
+  const lines = [
+    "[SYSTEM] Initializing terminal...",
+    "[SYSTEM] Loading geographic data...",
+    "[SYSTEM] Establishing connection to osu! network...",
+    `[SYSTEM] Render mode: ${lowPerf ? "LOW — reduced effects" : "FULL"}`,
+    "[SYSTEM] Operator interface ready."
+  ];
+  return lines;
+}
 
 const LINE_DELAY = 320;
 const GLITCH_DURATION = 600;
@@ -16,11 +20,13 @@ const FADE_DELAY = 1800;
 
 type BootSequenceProps = {
   children: React.ReactNode;
+  lowPerf?: boolean;
   onEnter?: () => void;
   skip?: boolean;
 };
 
-export function BootSequence({ children, onEnter, skip }: BootSequenceProps) {
+export function BootSequence({ children, lowPerf, onEnter, skip }: BootSequenceProps) {
+  const bootLines = getBootLines(!!lowPerf);
   const [phase, setPhase] = useState<"boot" | "waiting" | "glitch" | "fade" | "done">(skip ? "done" : "boot");
   const [visibleLines, setVisibleLines] = useState(skip ? 0 : 1);
 
@@ -38,7 +44,7 @@ export function BootSequence({ children, onEnter, skip }: BootSequenceProps) {
       lineIndex++;
       setVisibleLines(lineIndex);
 
-      if (lineIndex >= BOOT_LINES.length) {
+      if (lineIndex >= bootLines.length) {
         clearInterval(timer);
         setTimeout(() => setPhase("waiting"), 400);
       }
@@ -109,7 +115,7 @@ export function BootSequence({ children, onEnter, skip }: BootSequenceProps) {
           ) : null}
 
           <div className="fx-boot__terminal">
-            {BOOT_LINES.slice(0, visibleLines).map((line, i) => (
+            {bootLines.slice(0, visibleLines).map((line, i) => (
               <div key={i} className="fx-boot__line">
                 {line}
               </div>

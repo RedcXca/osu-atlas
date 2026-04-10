@@ -1367,7 +1367,7 @@ button.mode-rank-card:hover {
 .map-focus-card {
   position: absolute;
   top: 14px;
-  right: 14px;
+  left: 14px;
   z-index: 20;
   pointer-events: none;
   width: min(200px, calc(100% - 28px));
