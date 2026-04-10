@@ -96,8 +96,8 @@ export function playGlitch() {
   filter.Q.setValueAtTime(0.3, now);
 
   const gain = audio.createGain();
-  gain.gain.setValueAtTime(0.008, now);
-  gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+  gain.gain.setValueAtTime(0.04, now);
+  gain.gain.exponentialRampToValueAtTime(0.004, now + duration);
 
   noise.connect(filter);
   filter.connect(gain);
