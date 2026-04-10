@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { LeftDrawer } from "@/components/layout/left-drawer";
 import { RightDrawer } from "@/components/layout/right-drawer";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -68,6 +68,14 @@ export function MapDashboard({
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
 
+  // refs so callbacks stay stable across renders
+  const selectedCodeRef = useRef(selectedCode);
+  selectedCodeRef.current = selectedCode;
+  const hoveredCodeRef = useRef(hoveredCode);
+  hoveredCodeRef.current = hoveredCode;
+  const globeReadyRef = useRef(globeReady);
+  globeReadyRef.current = globeReady;
+
   useEffect(() => {
     setQuery("");
   }, [selectedCode]);
@@ -109,21 +117,23 @@ export function MapDashboard({
     return sortFriends(matchingFriends, friendSortMode);
   }, [friendSortMode, normalizedQuery, selectedCountry]);
 
-  const handleSelectCountry = (code: string | null) => {
+  const handleSelectCountry = useCallback((code: string | null) => {
     if (code) {
       playSelect();
-    } else if (selectedCode) {
+    } else if (selectedCodeRef.current) {
       playDeselect();
     }
     setSelectedCode(code);
-  };
+  }, []);
 
-  const handleHoverCountry = (code: string | null) => {
-    if (code && code !== hoveredCode && globeReady) {
+  const handleHoverCountry = useCallback((code: string | null) => {
+    if (code && code !== hoveredCodeRef.current && globeReadyRef.current) {
       playHover();
     }
     setHoveredCode(code);
-  };
+  }, []);
+
+  const handleGlobeReady = useCallback(() => setGlobeReady(true), []);
 
   return (
     <LanguageProvider>
@@ -153,7 +163,7 @@ export function MapDashboard({
                 bootEntered={bootEntered}
                 hoveredCode={hoveredCode}
                 mapCountries={mapCountries}
-                onGlobeReady={() => setGlobeReady(true)}
+                onGlobeReady={handleGlobeReady}
                 onHoverChange={handleHoverCountry}
                 onSelectCountry={handleSelectCountry}
                 selectedCode={selectedCode}

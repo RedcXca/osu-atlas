@@ -126,7 +126,10 @@ export function AtlasGlobe({
   );
 
   const focusedCode = hoveredCode ?? selectedCode;
-  const maxCount = Math.max(1, ...mapCountries.map((country) => country.count));
+  const maxCount = useMemo(
+    () => Math.max(1, ...mapCountries.map((country) => country.count)),
+    [mapCountries]
+  );
 
   const countByCode = useMemo(() => {
     const map = new Map<string, number>();
@@ -557,7 +560,11 @@ export function AtlasGlobe({
     if (!renderer || !scene || !camera) return;
 
     const composer = new EffectComposer(renderer);
-    composer.setSize(renderer.domElement.clientWidth, renderer.domElement.clientHeight);
+    const pixelRatio = renderer.getPixelRatio();
+    composer.setSize(
+      renderer.domElement.clientWidth * pixelRatio,
+      renderer.domElement.clientHeight * pixelRatio
+    );
     composer.addPass(new RenderPass(scene, camera));
 
     const chromaticAberration = new ChromaticAberrationEffect({
@@ -643,7 +650,163 @@ export function AtlasGlobe({
     }
   }, [friendLocations, globeInstance, handleInteraction, selectedCode]);
 
-  const focusedCountry = mapCountries.find((country) => country.code === focusedCode) ?? null;
+  const focusedCountry = useMemo(
+    () => mapCountries.find((country) => country.code === focusedCode) ?? null,
+    [focusedCode, mapCountries]
+  );
+
+  // memoized polygon accessors — prevents react-globe.gl from
+  // reprocessing all ~200 countries on unrelated re-renders
+  const polygonAltitude = useCallback(
+    (countryFeature: WorldGeoFeature) => {
+      const code = getCountryCodeFromFeature(countryFeature);
+      const count = code ? (countByCode.get(code) ?? 0) : 0;
+      const isHovered = code !== null && code === hoveredCode;
+      const isSelected = code !== null && code === selectedCode;
+      if (isSelected) return 0.024;
+      if (isHovered) return count > 0 ? 0.017 : 0.013;
+      return count > 0 ? 0.014 : 0.01;
+    },
+    [countByCode, hoveredCode, selectedCode]
+  );
+
+  const polygonCapColor = useCallback(
+    (countryFeature: WorldGeoFeature) => {
+      const code = getCountryCodeFromFeature(countryFeature);
+      const count = code ? (countByCode.get(code) ?? 0) : 0;
+      const isSelected = code !== null && code === selectedCode;
+      return getCountryColor(count, maxCount, isSelected);
+    },
+    [countByCode, maxCount, selectedCode]
+  );
+
+  const polygonSideColor = useCallback(
+    (countryFeature: WorldGeoFeature) => {
+      const code = getCountryCodeFromFeature(countryFeature);
+      const count = code ? (countByCode.get(code) ?? 0) : 0;
+      const isHovered = code !== null && code === hoveredCode;
+      const isSelected = code !== null && code === selectedCode;
+      if (isSelected) return "rgba(255, 255, 255, 0.1)";
+      if (isHovered) return count > 0 ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.05)";
+      return count > 0 ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.03)";
+    },
+    [countByCode, hoveredCode, selectedCode]
+  );
+
+  const polygonStrokeColor = useCallback(
+    (countryFeature: WorldGeoFeature) => {
+      const code = getCountryCodeFromFeature(countryFeature);
+      const count = code ? (countByCode.get(code) ?? 0) : 0;
+      const isSelected = code !== null && code === selectedCode;
+      const isHovered = code !== null && code === hoveredCode;
+      if (isHovered && !isSelected) return count > 0 ? "rgba(255, 255, 255, 0.7)" : "rgba(255, 255, 255, 0.45)";
+      return getCountryStroke(count, isSelected);
+    },
+    [countByCode, hoveredCode, selectedCode]
+  );
+
+  const polygonLabel = useCallback(
+    (countryFeature: WorldGeoFeature) => {
+      const code = getCountryCodeFromFeature(countryFeature);
+      if (!code) return "";
+      const name = getCountryDisplayName(code, locale);
+      const count = countByCode.get(code) ?? 0;
+      return `<div class="globe-tooltip">${countryCodeToFlag(code)} ${name}<br/><span>${t.friendCount(count)}</span></div>`;
+    },
+    [countByCode, locale, t]
+  );
+
+  const pointColor = useCallback(
+    (location: GlobeFriendLocation) =>
+      location.code === focusedCode ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 0.78)",
+    [focusedCode]
+  );
+
+  const pointAltitude = useCallback(
+    (location: GlobeFriendLocation) => {
+      const intensity = location.count / maxCount;
+      if (location.code === focusedCode) return 0.05;
+      return 0.016 + intensity * 0.022;
+    },
+    [focusedCode, maxCount]
+  );
+
+  const pointLabel = useCallback(
+    (location: GlobeFriendLocation) =>
+      `<div class="globe-tooltip">${countryCodeToFlag(location.code)} ${location.name}<br/><span>${t.friendCount(location.count)}</span></div>`,
+    [t]
+  );
+
+  const pointRadius = useCallback(
+    (location: GlobeFriendLocation) => {
+      const intensity = location.count / maxCount;
+      if (location.code === focusedCode) return 0.34;
+      return 0.19 + intensity * 0.1;
+    },
+    [focusedCode, maxCount]
+  );
+
+  const arcColor = useCallback(
+    () => ["rgba(255, 255, 255, 0.68)", "rgba(255, 255, 255, 0.06)"] as [string, string],
+    []
+  );
+
+  const arcDashInitialGap = useCallback(
+    (arc: GlobeRouteArc) => arc.index * 0.12,
+    []
+  );
+
+  const arcLabel = useCallback(
+    (arc: GlobeRouteArc) =>
+      `<div class="globe-tooltip">${arc.name}<br/><span>${t.friendCount(arc.count)}</span></div>`,
+    [t]
+  );
+
+  const arcStroke = useCallback(
+    (arc: GlobeRouteArc) => (arc.code === focusedCode ? 0.22 : 0.14),
+    [focusedCode]
+  );
+
+  const pointerEventsFilter = useCallback(
+    (_object: unknown, data: { kind?: string } | undefined) => data?.kind !== "route",
+    []
+  );
+
+  const handlePolygonHover = useCallback(
+    (countryFeature: WorldGeoFeature | null) => {
+      onHoverChange(countryFeature ? getCountryCodeFromFeature(countryFeature) : null);
+    },
+    [onHoverChange]
+  );
+
+  const handlePolygonClick = useCallback(
+    (countryFeature: WorldGeoFeature | null) => {
+      const code = countryFeature ? getCountryCodeFromFeature(countryFeature) : null;
+      if (code) onSelectCountry(code);
+      handleInteraction();
+    },
+    [handleInteraction, onSelectCountry]
+  );
+
+  const handlePointHover = useCallback(
+    (location: GlobeFriendLocation | null) => {
+      onHoverChange(location?.code ?? null);
+    },
+    [onHoverChange]
+  );
+
+  const handlePointClick = useCallback(
+    (location: GlobeFriendLocation) => {
+      onSelectCountry(location.code);
+      handleInteraction();
+    },
+    [handleInteraction, onSelectCountry]
+  );
+
+  const handleGlobeClick = useCallback(() => {
+    onSelectCountry(null);
+    handleInteraction();
+  }, [handleInteraction, onSelectCountry]);
 
   return (
     <section className="panel map-panel" ref={frameRef}>
@@ -682,136 +845,34 @@ export function AtlasGlobe({
             atmosphereAltitude={0.13}
             showGraticules={true}
             lineHoverPrecision={0.35}
-            pointerEventsFilter={(_object: unknown, data: { kind?: string } | undefined) =>
-              data?.kind !== "route"
-            }
+            pointerEventsFilter={pointerEventsFilter}
             polygonsData={worldGlobeFeatures}
-            polygonAltitude={(countryFeature: WorldGeoFeature) => {
-              const code = getCountryCodeFromFeature(countryFeature);
-              const count = code ? (countByCode.get(code) ?? 0) : 0;
-              const isHovered = code !== null && code === hoveredCode;
-              const isSelected = code !== null && code === selectedCode;
-
-              if (isSelected) {
-                return 0.024;
-              }
-
-              if (isHovered) {
-                return count > 0 ? 0.017 : 0.013;
-              }
-
-              return count > 0 ? 0.014 : 0.01;
-            }}
-            polygonCapColor={(countryFeature: WorldGeoFeature) => {
-              const code = getCountryCodeFromFeature(countryFeature);
-              const count = code ? (countByCode.get(code) ?? 0) : 0;
-              const isSelected = code !== null && code === selectedCode;
-
-              return getCountryColor(count, maxCount, isSelected);
-            }}
-            polygonSideColor={(countryFeature: WorldGeoFeature) => {
-              const code = getCountryCodeFromFeature(countryFeature);
-              const count = code ? (countByCode.get(code) ?? 0) : 0;
-              const isHovered = code !== null && code === hoveredCode;
-              const isSelected = code !== null && code === selectedCode;
-
-              if (isSelected) {
-                return "rgba(255, 255, 255, 0.1)";
-              }
-
-              if (isHovered) {
-                return count > 0 ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.05)";
-              }
-
-              return count > 0 ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.03)";
-            }}
-            polygonStrokeColor={(countryFeature: WorldGeoFeature) => {
-              const code = getCountryCodeFromFeature(countryFeature);
-              const count = code ? (countByCode.get(code) ?? 0) : 0;
-              const isSelected = code !== null && code === selectedCode;
-              const isHovered = code !== null && code === hoveredCode;
-
-              if (isHovered && !isSelected) {
-                return count > 0 ? "rgba(255, 255, 255, 0.7)" : "rgba(255, 255, 255, 0.45)";
-              }
-
-              return getCountryStroke(count, isSelected);
-            }}
+            polygonAltitude={polygonAltitude}
+            polygonCapColor={polygonCapColor}
+            polygonSideColor={polygonSideColor}
+            polygonStrokeColor={polygonStrokeColor}
             polygonsTransitionDuration={lowPerfMode ? 0 : 180}
-            polygonLabel={(countryFeature: WorldGeoFeature) => {
-              const code = getCountryCodeFromFeature(countryFeature);
-
-              if (!code) {
-                return "";
-              }
-
-              const name = getCountryDisplayName(code, locale);
-              const count = countByCode.get(code) ?? 0;
-
-              return `<div class="globe-tooltip">${countryCodeToFlag(code)} ${name}<br/><span>${t.friendCount(count)}</span></div>`;
-            }}
+            polygonLabel={polygonLabel}
             pointsData={friendLocations}
-            pointColor={(location: GlobeFriendLocation) =>
-              location.code === focusedCode
-                ? "rgba(255, 255, 255, 0.98)"
-                : "rgba(255, 255, 255, 0.78)"
-            }
-            pointAltitude={(location: GlobeFriendLocation) => {
-              const intensity = location.count / maxCount;
-
-              if (location.code === focusedCode) {
-                return 0.05;
-              }
-
-              return 0.016 + intensity * 0.022;
-            }}
-            pointLabel={(location: GlobeFriendLocation) =>
-              `<div class="globe-tooltip">${countryCodeToFlag(location.code)} ${location.name}<br/><span>${t.friendCount(location.count)}</span></div>`
-            }
-            pointRadius={(location: GlobeFriendLocation) => {
-              const intensity = location.count / maxCount;
-
-              if (location.code === focusedCode) {
-                return 0.34;
-              }
-
-              return 0.19 + intensity * 0.1;
-            }}
+            pointColor={pointColor}
+            pointAltitude={pointAltitude}
+            pointLabel={pointLabel}
+            pointRadius={pointRadius}
             pointsTransitionDuration={lowPerfMode ? 0 : 250}
             arcsData={routeArcs}
-            arcColor={() => ["rgba(255, 255, 255, 0.68)", "rgba(255, 255, 255, 0.06)"]}
+            arcColor={arcColor}
             arcDashAnimateTime={1800}
             arcDashGap={0.7}
-            arcDashInitialGap={(arc: GlobeRouteArc) => arc.index * 0.12}
+            arcDashInitialGap={arcDashInitialGap}
             arcDashLength={0.24}
-            arcLabel={(arc: GlobeRouteArc) =>
-              `<div class="globe-tooltip">${arc.name}<br/><span>${t.friendCount(arc.count)}</span></div>`
-            }
-            arcStroke={(arc: GlobeRouteArc) => (arc.code === focusedCode ? 0.22 : 0.14)}
+            arcLabel={arcLabel}
+            arcStroke={arcStroke}
             arcsTransitionDuration={lowPerfMode ? 0 : 600}
-            onPolygonHover={(countryFeature: WorldGeoFeature | null) => {
-              onHoverChange(countryFeature ? getCountryCodeFromFeature(countryFeature) : null);
-            }}
-            onPolygonClick={(countryFeature: WorldGeoFeature | null) => {
-              const code = countryFeature ? getCountryCodeFromFeature(countryFeature) : null;
-
-              if (code) {
-                onSelectCountry(code);
-              }
-
-              handleInteraction();
-            }}
-            onPointHover={(location: GlobeFriendLocation | null) => {
-              onHoverChange(location?.code ?? null);
-            }}
-            onPointClick={(location: GlobeFriendLocation) => {
-              onSelectCountry(location.code);
-              handleInteraction();
-            }}
-            onGlobeClick={() => {
-              onSelectCountry(null);
-              handleInteraction();
-            }}
+            onPolygonHover={handlePolygonHover}
+            onPolygonClick={handlePolygonClick}
+            onPointHover={handlePointHover}
+            onPointClick={handlePointClick}
+            onGlobeClick={handleGlobeClick}
             {...({ graticulesColor: "rgba(255, 255, 255, 0.06)" } as any)}
           />
         )}

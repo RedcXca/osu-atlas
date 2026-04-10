@@ -2728,6 +2728,12 @@ button.mode-rank-card:hover {
     align-items: flex-start;
   }
 
+  .profile-menu__panel {
+    right: auto;
+    left: 0;
+    max-width: calc(100vw - 40px);
+  }
+
   .page-shell {
     height: auto;
     min-height: 100vh;
@@ -2748,11 +2754,21 @@ button.mode-rank-card:hover {
   .left-drawer {
     position: static;
     width: auto;
+    display: none;
+  }
+
+  .globe-revealed .left-drawer {
+    display: block;
   }
 
   .right-drawer {
     position: static;
     width: auto;
+    display: none;
+  }
+
+  .globe-revealed .right-drawer {
+    display: block;
   }
 
   .left-drawer .drawer__body {
