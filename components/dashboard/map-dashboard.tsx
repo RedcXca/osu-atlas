@@ -1,10 +1,11 @@
 "use client";
 
-import { useDeferredValue, useEffect, useMemo, useState } from "react";
+import { useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { LeftDrawer } from "@/components/layout/left-drawer";
 import { RightDrawer } from "@/components/layout/right-drawer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { AtlasGlobe } from "@/components/globe/atlas-globe";
+import { WorldMap } from "@/components/map/world-map";
 import { BootSequence } from "@/components/fx/boot-sequence";
 import { ChromaticAberration } from "@/components/fx/chromatic-aberration";
 import { CircuitOverlay } from "@/components/fx/circuit-overlay";
@@ -48,6 +49,25 @@ export function MapDashboard({
   const [friendSortMode, setFriendSortMode] = useState<FriendSortMode>("alphabetical");
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
+  const webglSupported = useRef<boolean | null>(null);
+  const [webglChecked, setWebglChecked] = useState(false);
+
+  useEffect(() => {
+    try {
+      const canvas = document.createElement("canvas");
+      const gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
+      webglSupported.current = gl !== null;
+    } catch {
+      webglSupported.current = false;
+    }
+    setWebglChecked(true);
+
+    // skip boot/globe-ready gate when falling back to SVG map
+    if (!webglSupported.current) {
+      setGlobeReady(true);
+      setBootEntered(true);
+    }
+  }, []);
 
   useEffect(() => {
     setQuery("");
@@ -120,15 +140,26 @@ export function MapDashboard({
               snapshot={snapshot}
               viewer={viewer}
             />
-            <AtlasGlobe
-              bootEntered={bootEntered}
-              hoveredCode={hoveredCode}
-              mapCountries={mapCountries}
-              onGlobeReady={() => setGlobeReady(true)}
-              onHoverChange={handleHoverCountry}
-              onSelectCountry={handleSelectCountry}
-              selectedCode={selectedCode}
-            />
+            {webglChecked && webglSupported.current === false ? (
+              <WorldMap
+                hoveredCode={hoveredCode}
+                mapCountries={mapCountries}
+                unknownCount={snapshot.countries["UNKNOWN"]?.count ?? 0}
+                onHoverChange={handleHoverCountry}
+                onSelectCountry={handleSelectCountry}
+                selectedCode={selectedCode}
+              />
+            ) : (
+              <AtlasGlobe
+                bootEntered={bootEntered}
+                hoveredCode={hoveredCode}
+                mapCountries={mapCountries}
+                onGlobeReady={() => setGlobeReady(true)}
+                onHoverChange={handleHoverCountry}
+                onSelectCountry={handleSelectCountry}
+                selectedCode={selectedCode}
+              />
+            )}
             <RightDrawer
               countries={visibleCountries}
               countrySortMode={countrySortMode}
