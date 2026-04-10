@@ -22,13 +22,18 @@ type BootSequenceProps = {
 
 export function BootSequence({ children, onEnter, skip }: BootSequenceProps) {
   const [phase, setPhase] = useState<"boot" | "waiting" | "glitch" | "fade" | "done">(skip ? "done" : "boot");
-  const [visibleLines, setVisibleLines] = useState(0);
+  const [visibleLines, setVisibleLines] = useState(skip ? 0 : 1);
 
-  // type out boot lines
+  // remove SSR placeholder once we take over
+  useEffect(() => {
+    document.getElementById("ssr-boot")?.remove();
+  }, []);
+
+  // type out boot lines (first line renders immediately to avoid hydration stall)
   useEffect(() => {
     if (phase !== "boot") return;
 
-    let lineIndex = 0;
+    let lineIndex = 1;
     const timer = setInterval(() => {
       lineIndex++;
       setVisibleLines(lineIndex);
