@@ -56,7 +56,6 @@ export default function RootLayout({
       <body>
         <div id="ssr-boot" className="fx-boot" aria-hidden="true">
           <div className="fx-boot__terminal">
-            <div className="fx-boot__line">[SYSTEM] Initializing terminal...</div>
             <span className="fx-boot__cursor">_</span>
           </div>
         </div>
