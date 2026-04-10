@@ -2,7 +2,7 @@
 export function countryCodeToFlag(code: string): string {
   const upper = code.toUpperCase();
   if (upper.length !== 2) return "";
-  return `<img src="https://flagcdn.com/${code.toLowerCase()}.svg" alt="${upper}" width="16" height="12" style="display:inline-block;vertical-align:middle" />`;
+  return `<img src="https://flagcdn.com/${code.toLowerCase()}.svg" alt="${upper}" width="16" height="12" class="country-flag" />`;
 }
 
 export function getCountryDisplayName(countryCode: string | null, locale = "en") {
