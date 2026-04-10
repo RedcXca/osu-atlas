@@ -16,3 +16,4 @@ yarn-error.log*
 out/
 .vercel
 .env*.local
+.ignored/
