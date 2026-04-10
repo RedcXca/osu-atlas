@@ -17,10 +17,11 @@ const FADE_DELAY = 1800;
 type BootSequenceProps = {
   children: React.ReactNode;
   onEnter?: () => void;
+  skip?: boolean;
 };
 
-export function BootSequence({ children, onEnter }: BootSequenceProps) {
-  const [phase, setPhase] = useState<"boot" | "waiting" | "glitch" | "fade" | "done">("boot");
+export function BootSequence({ children, onEnter, skip }: BootSequenceProps) {
+  const [phase, setPhase] = useState<"boot" | "waiting" | "glitch" | "fade" | "done">(skip ? "done" : "boot");
   const [visibleLines, setVisibleLines] = useState(0);
 
   // type out boot lines

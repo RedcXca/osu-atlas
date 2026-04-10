@@ -118,7 +118,7 @@ export function MapDashboard({
 
   return (
     <LanguageProvider>
-      <BootSequence onEnter={() => setBootEntered(true)}>
+      <BootSequence onEnter={() => setBootEntered(true)} skip={!hasWebGL}>
         <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
           <SiteHeader viewer={viewer} />
           <section className="dashboard-grid">
