@@ -129,6 +129,7 @@ img {
 .dashboard-grid {
   position: relative;
   z-index: 1;
+  isolation: isolate;
   display: grid;
   height: 100%;
   min-height: 0;
@@ -159,10 +160,11 @@ img {
   top: 12px;
   bottom: 12px;
   left: 12px;
-  z-index: 10;
+  z-index: 40;
   width: 300px;
   clip-path: var(--clip-lg);
   overflow: hidden;
+  pointer-events: auto;
   opacity: 0;
   transform: translateX(-24px);
   transition: opacity 800ms var(--ease-nier), transform 800ms var(--ease-nier);
@@ -173,8 +175,9 @@ img {
   top: 12px;
   bottom: 12px;
   right: 12px;
-  z-index: 10;
+  z-index: 40;
   width: 360px;
+  pointer-events: auto;
   opacity: 0;
   transform: translateX(24px);
   transition: opacity 800ms var(--ease-nier) 150ms, transform 800ms var(--ease-nier) 150ms;
@@ -198,7 +201,7 @@ img {
   gap: 20px;
   padding: 14px 20px 12px;
   overflow: hidden;
-  z-index: 10;
+  z-index: 40;
   border-bottom: 1px solid transparent;
   opacity: 0;
   max-height: 0;
@@ -720,6 +723,10 @@ img {
   font-size: 1rem;
 }
 
+.left-drawer__mutual-toggle {
+  margin: 2px 0 -2px;
+}
+
 .left-drawer__country-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1172,6 +1179,7 @@ button.mode-rank-card:hover {
 
 .map-panel {
   display: flex;
+  z-index: 0;
   min-width: 0;
   min-height: 0;
   background: transparent;
@@ -1672,6 +1680,74 @@ button.mode-rank-card:hover {
   border-color: rgba(200, 192, 184, 0.2);
   background: rgba(200, 192, 184, 0.08);
   color: #fff;
+}
+
+/* ──────────────────────────────────────
+   nier toggle
+   ────────────────────────────────────── */
+
+.nier-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  flex-shrink: 0;
+}
+
+.nier-toggle input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.nier-toggle__track {
+  position: relative;
+  width: 36px;
+  height: 18px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.nier-toggle input:checked + .nier-toggle__track {
+  border-color: var(--accent);
+  background: rgba(200, 192, 184, 0.12);
+}
+
+.nier-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 12px;
+  height: 12px;
+  background: var(--text-dim);
+  clip-path: polygon(2px 0, 100% 0, calc(100% - 2px) 100%, 0 100%);
+  transition: transform 180ms ease, background 180ms ease;
+}
+
+.nier-toggle input:checked + .nier-toggle__track .nier-toggle__thumb {
+  transform: translateX(18px);
+  background: var(--accent);
+}
+
+.nier-toggle__label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  transition: color 180ms ease;
+}
+
+.nier-toggle input:checked ~ .nier-toggle__label {
+  color: var(--accent);
+}
+
+.nier-toggle:hover .nier-toggle__track {
+  border-color: var(--accent);
 }
 
 /* ──────────────────────────────────────

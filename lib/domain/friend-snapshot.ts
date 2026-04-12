@@ -31,6 +31,7 @@ export function normalizeSnapshotFriend(friend: OsuFriend): OsuFriend {
     countryName,
     globalRank: friend.globalRank,
     modeRanks: normalizeModeRanks(friend.modeRanks),
+    mutual: friend.mutual ?? false,
     osuId: friend.osuId,
     username: friend.username
   };
@@ -68,7 +69,8 @@ export function buildFriendSnapshot(
     syncedAt: new Date().toISOString(),
     totals: {
       countryCount: Object.keys(countries).length,
-      friendCount: rawFriends.length
+      friendCount: rawFriends.length,
+      mutualCount: rawFriends.filter((f) => f.mutual).length
     }
   };
 }
@@ -80,7 +82,8 @@ export function createEmptyFriendSnapshot(): FriendSnapshot {
     syncedAt: new Date().toISOString(),
     totals: {
       countryCount: 0,
-      friendCount: 0
+      friendCount: 0,
+      mutualCount: 0
     }
   };
 }

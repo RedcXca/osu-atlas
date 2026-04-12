@@ -224,7 +224,7 @@ function extractModeRanks(user: OsuApiUser): OsuModeRanks {
   );
 }
 
-function toOsuFriend(user: OsuApiUser): OsuFriend {
+function toOsuFriend(user: OsuApiUser, mutual = false): OsuFriend {
   const modeRanks = extractModeRanks(user);
 
   return {
@@ -233,6 +233,7 @@ function toOsuFriend(user: OsuApiUser): OsuFriend {
     countryName: user.country?.name ?? null,
     globalRank: modeRanks.osu,
     modeRanks,
+    mutual,
     osuId: user.id,
     username: user.username
   };
@@ -241,12 +242,25 @@ function toOsuFriend(user: OsuApiUser): OsuFriend {
 export async function fetchFriends(accessToken: string): Promise<OsuFriend[]> {
   const payload = await osuApiFetch<unknown>("/api/v2/friends", accessToken);
   const rawFriends = coerceUsersFromFriendsResponse(payload);
+
+  // capture mutual status from the raw /friends response before hydration
+  // the api returns { mutual: boolean, ... } per relation entry
+  const mutualById = new Map<number, boolean>();
+  if (Array.isArray(payload)) {
+    for (const entry of payload as { id?: number; target_id?: number; mutual?: boolean }[]) {
+      const id = entry.id ?? entry.target_id;
+      if (id != null) mutualById.set(id, entry.mutual === true);
+    }
+  }
+
   const uniqueFriendIds = [...new Set(rawFriends.map((friend) => friend.id))];
-  // Hydrate per-ruleset ranks from the documented users endpoint instead of trusting /friends.
+  // hydrate per-ruleset ranks from the documented users endpoint instead of trusting /friends
   const detailedFriends = await fetchUsersByIds(accessToken, uniqueFriendIds);
   const detailedFriendsById = new Map(detailedFriends.map((friend) => [friend.id, friend]));
 
-  return rawFriends.map((friend) => toOsuFriend(detailedFriendsById.get(friend.id) ?? friend));
+  return rawFriends.map((friend) =>
+    toOsuFriend(detailedFriendsById.get(friend.id) ?? friend, mutualById.get(friend.id) ?? false)
+  );
 }
 
 export function toOsuViewer(user: OsuApiUser): OsuViewer {

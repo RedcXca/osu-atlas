@@ -19,7 +19,7 @@ import {
 } from "three";
 import { HudOverlay } from "@/components/fx/hud-overlay";
 import { SpaceBackground } from "@/components/fx/space-background";
-import { CountryFlag } from "@/components/ui/country-flag";
+import { playHover } from "@/lib/audio/ui-sounds";
 import { countryCodeToFlag, getCountryDisplayName } from "@/lib/domain/countries";
 import { useLanguage } from "@/lib/i18n/context";
 import type { WorldMapCountry } from "@/lib/models";
@@ -37,10 +37,8 @@ const MIN_GLOBE_SURFACE_OFFSET = 10;
 
 type AtlasGlobeProps = {
   bootEntered?: boolean;
-  hoveredCode: string | null;
   mapCountries: WorldMapCountry[];
   onGlobeReady?: () => void;
-  onHoverChange: (code: string | null) => void;
   onSelectCountry: (code: string | null) => void;
   selectedCode: string | null;
 };
@@ -94,10 +92,8 @@ function getCountryStroke(count: number, isActive: boolean): string {
 
 export function AtlasGlobe({
   bootEntered,
-  hoveredCode,
   mapCountries,
   onGlobeReady,
-  onHoverChange,
   onSelectCountry,
   selectedCode
 }: Readonly<AtlasGlobeProps>) {
@@ -107,7 +103,10 @@ export function AtlasGlobe({
     return navigator.hardwareConcurrency != null && navigator.hardwareConcurrency <= 4;
   });
   const globeRef = useRef<any>(null);
-  const [globeInstance, setGlobeInstance] = useState<any>(null);
+  const [globeReady, setGlobeReady] = useState(false);
+  const globeReadyRef = useRef(false);
+  const [hoveredCode, setHoveredCode] = useState<string | null>(null);
+  const hoveredCodeRef = useRef<string | null>(null);
   const frameRef = useRef<HTMLElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const spaceBgRef = useRef<HTMLDivElement>(null);
@@ -124,8 +123,8 @@ export function AtlasGlobe({
       }),
     []
   );
-
-  const focusedCode = hoveredCode ?? selectedCode;
+  const highlightedCode = hoveredCode ?? selectedCode;
+  const routeFocusCode = selectedCode;
   const maxCount = useMemo(
     () => Math.max(1, ...mapCountries.map((country) => country.count)),
     [mapCountries]
@@ -187,12 +186,12 @@ export function AtlasGlobe({
       return null;
     }
 
-    if (focusedCode) {
-      return friendLocations.find((location) => location.code === focusedCode) ?? friendLocations[0];
+    if (routeFocusCode) {
+      return friendLocations.find((location) => location.code === routeFocusCode) ?? friendLocations[0];
     }
 
     return friendLocations[0];
-  }, [focusedCode, friendLocations]);
+  }, [friendLocations, routeFocusCode]);
 
   const routeArcs = useMemo<GlobeRouteArc[]>(() => {
     if (!routeSource) {
@@ -267,7 +266,7 @@ export function AtlasGlobe({
   }, []);
 
   useEffect(() => {
-    const globe = globeInstance ?? globeRef.current;
+    const globe = globeRef.current;
 
     if (!globe || dimensions.width <= 0 || dimensions.height <= 0) {
       return;
@@ -324,16 +323,15 @@ export function AtlasGlobe({
     return () => {
       cancelAnimationFrame(frameId);
     };
-  }, [dimensions.height, dimensions.width, globeInstance, globeMaterial]);
+  }, [dimensions.height, dimensions.width, globeReady, globeMaterial]);
 
   // cinematic zoom-out triggered when user presses enter on boot screen
   useEffect(() => {
     if (!bootEntered) return;
 
-    const globe = globeInstance ?? globeRef.current;
+    const globe = globeRef.current;
     if (!globe) return;
 
-    const controls = globe.controls();
     const zoomDuration = 4500;
 
     // slow pull from surface to orbit
@@ -346,11 +344,12 @@ export function AtlasGlobe({
     return () => {
       clearTimeout(readyTimer);
     };
-  }, [bootEntered, globeInstance]);
+  }, [bootEntered, globeReady]);
 
   // three.js starfield — lives in the globe scene so it rotates with the camera
   useEffect(() => {
-    const globe = globeInstance ?? globeRef.current;
+    if (!globeReady) return;
+    const globe = globeRef.current;
     if (!globe) return;
 
     const scene = globe.scene();
@@ -546,12 +545,13 @@ export function AtlasGlobe({
       fgGeo.dispose();
       fgMat.dispose();
     };
-  }, [globeInstance]);
+  }, [globeReady]);
 
   // post-processing — chromatic aberration only (skipped on low-end hardware)
   useEffect(() => {
     if (lowPerfMode) return;
-    const globe = globeInstance ?? globeRef.current;
+    if (!globeReady) return;
+    const globe = globeRef.current;
     if (!globe) return;
 
     const renderer = globe.renderer();
@@ -591,7 +591,7 @@ export function AtlasGlobe({
       renderer.render = originalRender;
       composer.dispose();
     };
-  }, [globeInstance]);
+  }, [globeReady]);
 
 
   const resumeAutoRotate = useCallback(() => {
@@ -610,7 +610,10 @@ export function AtlasGlobe({
 
   const handleGlobeRef = useCallback((instance: any) => {
     globeRef.current = instance;
-    setGlobeInstance(instance);
+    if (instance) {
+      globeReadyRef.current = true;
+      setGlobeReady(true);
+    }
   }, []);
 
   const handleInteraction = useCallback(() => {
@@ -628,7 +631,7 @@ export function AtlasGlobe({
       return;
     }
 
-    const globe = globeInstance ?? globeRef.current;
+    const globe = globeRef.current;
     if (!globe) return;
 
     // try friend locations first, fall back to country centroid
@@ -648,15 +651,10 @@ export function AtlasGlobe({
         handleInteraction();
       }
     }
-  }, [friendLocations, globeInstance, handleInteraction, selectedCode]);
+  }, [friendLocations, globeReady, handleInteraction, selectedCode]);
 
-  const focusedCountry = useMemo(
-    () => mapCountries.find((country) => country.code === focusedCode) ?? null,
-    [focusedCode, mapCountries]
-  );
-
-  // memoized polygon accessors — prevents react-globe.gl from
-  // reprocessing all ~200 countries on unrelated re-renders
+  // polygon accessors — hover state triggers new refs so three-globe re-evaluates,
+  // but memo'd children (HudOverlay, SpaceBackground) skip re-render
   const polygonAltitude = useCallback(
     (countryFeature: WorldGeoFeature) => {
       const code = getCountryCodeFromFeature(countryFeature);
@@ -718,17 +716,17 @@ export function AtlasGlobe({
 
   const pointColor = useCallback(
     (location: GlobeFriendLocation) =>
-      location.code === focusedCode ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 0.78)",
-    [focusedCode]
+      location.code === highlightedCode ? "rgba(255, 255, 255, 0.98)" : "rgba(255, 255, 255, 0.78)",
+    [highlightedCode]
   );
 
   const pointAltitude = useCallback(
     (location: GlobeFriendLocation) => {
       const intensity = location.count / maxCount;
-      if (location.code === focusedCode) return 0.05;
+      if (location.code === highlightedCode) return 0.05;
       return 0.016 + intensity * 0.022;
     },
-    [focusedCode, maxCount]
+    [highlightedCode, maxCount]
   );
 
   const pointLabel = useCallback(
@@ -740,10 +738,10 @@ export function AtlasGlobe({
   const pointRadius = useCallback(
     (location: GlobeFriendLocation) => {
       const intensity = location.count / maxCount;
-      if (location.code === focusedCode) return 0.34;
+      if (location.code === highlightedCode) return 0.34;
       return 0.19 + intensity * 0.1;
     },
-    [focusedCode, maxCount]
+    [highlightedCode, maxCount]
   );
 
   const arcColor = useCallback(
@@ -763,8 +761,8 @@ export function AtlasGlobe({
   );
 
   const arcStroke = useCallback(
-    (arc: GlobeRouteArc) => (arc.code === focusedCode ? 0.22 : 0.14),
-    [focusedCode]
+    (arc: GlobeRouteArc) => (arc.code === highlightedCode ? 0.22 : 0.14),
+    [highlightedCode]
   );
 
   const pointerEventsFilter = useCallback(
@@ -772,11 +770,17 @@ export function AtlasGlobe({
     []
   );
 
+  const updateHover = useCallback((code: string | null) => {
+    if (code === hoveredCodeRef.current) return;
+    if (code && globeReadyRef.current) playHover();
+    hoveredCodeRef.current = code;
+    setHoveredCode(code);
+  }, []);
+
   const handlePolygonHover = useCallback(
-    (countryFeature: WorldGeoFeature | null) => {
-      onHoverChange(countryFeature ? getCountryCodeFromFeature(countryFeature) : null);
-    },
-    [onHoverChange]
+    (countryFeature: WorldGeoFeature | null) =>
+      updateHover(countryFeature ? getCountryCodeFromFeature(countryFeature) : null),
+    [updateHover]
   );
 
   const handlePolygonClick = useCallback(
@@ -789,10 +793,9 @@ export function AtlasGlobe({
   );
 
   const handlePointHover = useCallback(
-    (location: GlobeFriendLocation | null) => {
-      onHoverChange(location?.code ?? null);
-    },
-    [onHoverChange]
+    (location: GlobeFriendLocation | null) =>
+      updateHover(location?.code ?? null),
+    [updateHover]
   );
 
   const handlePointClick = useCallback(
@@ -807,6 +810,63 @@ export function AtlasGlobe({
     onSelectCountry(null);
     handleInteraction();
   }, [handleInteraction, onSelectCountry]);
+
+  // memoize Globe element — survives the globeReady state flip without
+  // double-rendering; hover still busts it (necessary for three-globe)
+  const globeElement = useMemo(
+    () => (
+      <Globe
+        ref={handleGlobeRef}
+        width={dimensions.width}
+        height={dimensions.height}
+        backgroundColor="rgba(0,0,0,0)"
+        globeMaterial={globeMaterial}
+        atmosphereColor="rgba(210, 205, 200, 0.24)"
+        atmosphereAltitude={0.13}
+        showGraticules={true}
+        lineHoverPrecision={0.35}
+        pointerEventsFilter={pointerEventsFilter}
+        polygonsData={worldGlobeFeatures}
+        polygonAltitude={polygonAltitude}
+        polygonCapColor={polygonCapColor}
+        polygonSideColor={polygonSideColor}
+        polygonStrokeColor={polygonStrokeColor}
+        polygonsTransitionDuration={0}
+        polygonLabel={polygonLabel}
+        pointsData={friendLocations}
+        pointColor={pointColor}
+        pointAltitude={pointAltitude}
+        pointLabel={pointLabel}
+        pointRadius={pointRadius}
+        pointsTransitionDuration={0}
+        arcsData={routeArcs}
+        arcColor={arcColor}
+        arcDashAnimateTime={1800}
+        arcDashGap={0.7}
+        arcDashInitialGap={arcDashInitialGap}
+        arcDashLength={0.24}
+        arcLabel={arcLabel}
+        arcStroke={arcStroke}
+        arcsTransitionDuration={0}
+        onPolygonHover={handlePolygonHover}
+        onPolygonClick={handlePolygonClick}
+        onPointHover={handlePointHover}
+        onPointClick={handlePointClick}
+        onGlobeClick={handleGlobeClick}
+        {...({ graticulesColor: "rgba(255, 255, 255, 0.06)" } as any)}
+      />
+    ),
+    [
+      handleGlobeRef, dimensions.width, dimensions.height,
+      globeMaterial, pointerEventsFilter,
+      polygonAltitude, polygonCapColor, polygonSideColor,
+      polygonStrokeColor, polygonLabel,
+      friendLocations, pointColor, pointAltitude, pointLabel, pointRadius,
+      routeArcs, arcColor, arcDashInitialGap, arcLabel, arcStroke,
+      handlePolygonHover, handlePolygonClick,
+      handlePointHover, handlePointClick, handleGlobeClick
+    ]
+  );
 
   return (
     <section className="panel map-panel" ref={frameRef}>
@@ -823,59 +883,11 @@ export function AtlasGlobe({
         <SpaceBackground ref={spaceBgRef} />
         <HudOverlay />
 
-        {focusedCountry && focusedCountry.count > 0 ? (
-          <div className="map-focus-card">
-            <strong><CountryFlag code={focusedCountry.code} /> {getCountryDisplayName(focusedCountry.code ?? "", locale)}</strong>
-            <p>{t.friendCount(focusedCountry.count)}</p>
-          </div>
-        ) : null}
-
         {dimensions.width <= 0 ? (
           <div className="globe-loading">
             <span className="globe-loading__text">[LOADING GEOGRAPHIC DATA...]</span>
           </div>
-        ) : (
-          <Globe
-            ref={handleGlobeRef}
-            width={dimensions.width}
-            height={dimensions.height}
-            backgroundColor="rgba(0,0,0,0)"
-            globeMaterial={globeMaterial}
-            atmosphereColor="rgba(210, 205, 200, 0.24)"
-            atmosphereAltitude={0.13}
-            showGraticules={true}
-            lineHoverPrecision={0.35}
-            pointerEventsFilter={pointerEventsFilter}
-            polygonsData={worldGlobeFeatures}
-            polygonAltitude={polygonAltitude}
-            polygonCapColor={polygonCapColor}
-            polygonSideColor={polygonSideColor}
-            polygonStrokeColor={polygonStrokeColor}
-            polygonsTransitionDuration={lowPerfMode ? 0 : 180}
-            polygonLabel={polygonLabel}
-            pointsData={friendLocations}
-            pointColor={pointColor}
-            pointAltitude={pointAltitude}
-            pointLabel={pointLabel}
-            pointRadius={pointRadius}
-            pointsTransitionDuration={lowPerfMode ? 0 : 250}
-            arcsData={routeArcs}
-            arcColor={arcColor}
-            arcDashAnimateTime={1800}
-            arcDashGap={0.7}
-            arcDashInitialGap={arcDashInitialGap}
-            arcDashLength={0.24}
-            arcLabel={arcLabel}
-            arcStroke={arcStroke}
-            arcsTransitionDuration={lowPerfMode ? 0 : 600}
-            onPolygonHover={handlePolygonHover}
-            onPolygonClick={handlePolygonClick}
-            onPointHover={handlePointHover}
-            onPointClick={handlePointClick}
-            onGlobeClick={handleGlobeClick}
-            {...({ graticulesColor: "rgba(255, 255, 255, 0.06)" } as any)}
-          />
-        )}
+        ) : globeElement}
       </div>
     </section>
   );

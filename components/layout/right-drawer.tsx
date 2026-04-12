@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CountryBreakdownList } from "@/components/countries/country-breakdown-list";
 import { DataCorruption } from "@/components/fx/data-corruption";
 import { FriendList } from "@/components/friends/friend-list";
@@ -35,7 +36,7 @@ const FRIEND_SORT_OPTIONS: { label: string; value: FriendSortMode }[] = [
   { label: "Mania", value: "mania" }
 ];
 
-export function RightDrawer({
+export const RightDrawer = memo(function RightDrawer({
   countries,
   countrySortMode,
   filteredFriends,
@@ -125,4 +126,6 @@ export function RightDrawer({
       </div>
     </aside>
   );
-}
+});
+
+RightDrawer.displayName = "RightDrawer";

@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 
 // NieR-style holographic HUD elements floating around the globe
 // purely decorative — no interaction, no data
-export function HudOverlay() {
+export const HudOverlay = memo(function HudOverlay() {
   const [tick, setTick] = useState(0);
 
   // slow tick for cycling data readouts
@@ -100,4 +100,4 @@ export function HudOverlay() {
       </svg>
     </div>
   );
-}
+});

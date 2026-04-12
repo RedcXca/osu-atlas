@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { DataCorruption } from "@/components/fx/data-corruption";
 import { LanguageSelector } from "@/components/layout/language-selector";
 import { APP_ROUTES } from "@/lib/config/routes";
@@ -65,7 +65,7 @@ type SiteHeaderProps = {
   viewer: OsuViewer | null;
 };
 
-export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
+export const SiteHeader = memo(function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -172,4 +172,6 @@ export function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
       </div>
     </header>
   );
-}
+});
+
+SiteHeader.displayName = "SiteHeader";

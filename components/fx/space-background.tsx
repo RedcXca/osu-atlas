@@ -1,11 +1,11 @@
 "use client";
 
-import { forwardRef } from "react";
+import { forwardRef, memo } from "react";
 
 // starfield that rotates with the globe camera via CSS custom properties
 // --cam-x and --cam-y are set directly on this element by the globe's RAF loop,
 // bypassing React re-renders entirely
-export const SpaceBackground = forwardRef<HTMLDivElement>(function SpaceBackground(_props, ref) {
+export const SpaceBackground = memo(forwardRef<HTMLDivElement>(function SpaceBackground(_props, ref) {
   return (
     <div
       className="space-bg"
@@ -21,4 +21,4 @@ export const SpaceBackground = forwardRef<HTMLDivElement>(function SpaceBackgrou
       </div>
     </div>
   );
-});
+}));

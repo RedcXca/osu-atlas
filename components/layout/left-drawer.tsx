@@ -1,3 +1,4 @@
+import { memo, useMemo } from "react";
 import { DataCorruption } from "@/components/fx/data-corruption";
 import { SoundtrackDock } from "@/components/fx/soundtrack-dock";
 import { CountryFlag } from "@/components/ui/country-flag";
@@ -10,8 +11,10 @@ const DEFAULT_AVATAR = "https://osu.ppy.sh/images/layout/avatar-guest@2x.png";
 type LeftDrawerProps = {
   authMessage: string | null;
   demoMode: boolean;
+  mutualOnly: boolean;
   onFriendSortModeChange: (mode: OsuGameMode) => void;
-  onSelectCountry: (code: string) => void;
+  onMutualOnlyChange: (value: boolean) => void;
+  onSelectCountry: (code: string | null) => void;
   snapshot: FriendSnapshot;
   viewer: OsuViewer | null;
 };
@@ -24,10 +27,12 @@ const MODE_LABELS: Record<OsuGameMode, string> = {
   taiko: "Taiko"
 };
 
-export function LeftDrawer({
+export const LeftDrawer = memo(function LeftDrawer({
   authMessage,
   demoMode,
+  mutualOnly,
   onFriendSortModeChange,
+  onMutualOnlyChange,
   onSelectCountry,
   snapshot,
   viewer
@@ -37,59 +42,75 @@ export function LeftDrawer({
   const displayName = viewer?.username ?? "demo";
   const displayAvatar = viewer?.avatarUrl ?? DEFAULT_AVATAR;
 
-  const allFriends = Object.values(snapshot.countries).flatMap((country) => country.friends);
-  const modeCards = (["osu", "taiko", "fruits", "mania"] as OsuGameMode[]).map((mode) => {
-    const bestFriend = allFriends.reduce<{
-      friend: OsuFriend | null;
-      rank: number | null;
-    }>(
-      (currentBest, friend) => {
-        const rank = friend.modeRanks?.[mode] ?? (mode === "osu" ? friend.globalRank : null);
+  const allFriends = useMemo(
+    () => Object.values(snapshot.countries).flatMap((country) => country.friends),
+    [snapshot.countries]
+  );
+  const modeCards = useMemo(
+    () =>
+      (["osu", "taiko", "fruits", "mania"] as OsuGameMode[]).map((mode) => {
+        const bestFriend = allFriends.reduce<{
+          friend: OsuFriend | null;
+          rank: number | null;
+        }>(
+          (currentBest, friend) => {
+            const rank = friend.modeRanks?.[mode] ?? (mode === "osu" ? friend.globalRank : null);
 
-        if (rank === null) {
-          return currentBest;
+            if (rank === null) {
+              return currentBest;
+            }
+
+            if (currentBest.rank === null || rank < currentBest.rank) {
+              return { friend, rank };
+            }
+
+            if (
+              currentBest.rank === rank &&
+              currentBest.friend &&
+              friend.username.localeCompare(currentBest.friend.username) < 0
+            ) {
+              return { friend, rank };
+            }
+
+            return currentBest;
+          },
+          { friend: null, rank: null }
+        );
+
+        return {
+          ...bestFriend,
+          label: MODE_LABELS[mode],
+          mode
+        };
+      }),
+    [allFriends]
+  );
+  const mappedCountries = useMemo(
+    () => Object.values(snapshot.countries).filter((country) => country.code !== "UNKNOWN"),
+    [snapshot.countries]
+  );
+  const topCountry = useMemo(
+    () =>
+      [...mappedCountries].sort((left, right) => {
+        if (right.count !== left.count) {
+          return right.count - left.count;
         }
 
-        if (currentBest.rank === null || rank < currentBest.rank) {
-          return { friend, rank };
+        return left.name.localeCompare(right.name);
+      })[0] ?? null,
+    [mappedCountries]
+  );
+  const rarestCountry = useMemo(
+    () =>
+      [...mappedCountries].sort((left, right) => {
+        if (left.count !== right.count) {
+          return left.count - right.count;
         }
 
-        if (
-          currentBest.rank === rank &&
-          currentBest.friend &&
-          friend.username.localeCompare(currentBest.friend.username) < 0
-        ) {
-          return { friend, rank };
-        }
-
-        return currentBest;
-      },
-      { friend: null, rank: null }
-    );
-
-    return {
-      ...bestFriend,
-      label: MODE_LABELS[mode],
-      mode
-    };
-  });
-  const mappedCountries = Object.values(snapshot.countries).filter((country) => country.code !== "UNKNOWN");
-  const topCountry =
-    [...mappedCountries].sort((left, right) => {
-      if (right.count !== left.count) {
-        return right.count - left.count;
-      }
-
-      return left.name.localeCompare(right.name);
-    })[0] ?? null;
-  const rarestCountry =
-    [...mappedCountries].sort((left, right) => {
-      if (left.count !== right.count) {
-        return left.count - right.count;
-      }
-
-      return left.name.localeCompare(right.name);
-    })[0] ?? null;
+        return left.name.localeCompare(right.name);
+      })[0] ?? null,
+    [mappedCountries]
+  );
 
   return (
     <aside className="panel drawer left-drawer">
@@ -113,6 +134,18 @@ export function LeftDrawer({
               <strong>{snapshot.totals.countryCount}</strong>
             </article>
           </div>
+
+          <label className="nier-toggle left-drawer__mutual-toggle">
+            <input
+              type="checkbox"
+              checked={mutualOnly}
+              onChange={(e) => onMutualOnlyChange(e.target.checked)}
+            />
+            <span className="nier-toggle__track">
+              <span className="nier-toggle__thumb" />
+            </span>
+            <span className="nier-toggle__label">mutual only</span>
+          </label>
 
           <div className="left-drawer__country-strip">
             <button
@@ -199,5 +232,27 @@ export function LeftDrawer({
         <SoundtrackDock />
       </div>
     </aside>
+  );
+}, areLeftDrawerPropsEqual);
+
+LeftDrawer.displayName = "LeftDrawer";
+
+function areLeftDrawerPropsEqual(
+  previousProps: Readonly<LeftDrawerProps>,
+  nextProps: Readonly<LeftDrawerProps>
+) {
+  return (
+    previousProps.authMessage === nextProps.authMessage &&
+    previousProps.demoMode === nextProps.demoMode &&
+    previousProps.mutualOnly === nextProps.mutualOnly &&
+    previousProps.onFriendSortModeChange === nextProps.onFriendSortModeChange &&
+    previousProps.onMutualOnlyChange === nextProps.onMutualOnlyChange &&
+    previousProps.onSelectCountry === nextProps.onSelectCountry &&
+    previousProps.snapshot.countries === nextProps.snapshot.countries &&
+    previousProps.snapshot.totals.friendCount === nextProps.snapshot.totals.friendCount &&
+    previousProps.snapshot.totals.countryCount === nextProps.snapshot.totals.countryCount &&
+    previousProps.viewer?.osuId === nextProps.viewer?.osuId &&
+    previousProps.viewer?.username === nextProps.viewer?.username &&
+    previousProps.viewer?.avatarUrl === nextProps.viewer?.avatarUrl
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const PLAYBACK_VOLUME = 0.15;
 
@@ -100,18 +100,58 @@ export function SoundtrackDock() {
     }
   }, [isMuted]);
 
-  async function handlePlayPause() {
+  const playAudio = useCallback(async (audio: HTMLAudioElement) => {
+    audio.volume = PLAYBACK_VOLUME;
+
+    try {
+      await audio.play();
+    } catch {
+      // blocked
+    }
+  }, []);
+
+  const togglePlayback = useCallback(async () => {
     const audio = audioRef.current;
-    if (!audio) return;
+    if (!audio || !track?.previewUrl) return;
 
     if (isPlaying) {
       audio.pause();
     } else {
-      audio.currentTime = 0;
-      audio.volume = PLAYBACK_VOLUME;
-      try { await audio.play(); } catch { /* blocked */ }
+      await playAudio(audio);
     }
-  }
+  }, [isPlaying, playAudio, track?.previewUrl]);
+
+  // ref so the keydown listener is stable — avoids re-adding on every play/pause
+  const togglePlaybackRef = useRef(togglePlayback);
+  togglePlaybackRef.current = togglePlayback;
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code !== "Space" || event.repeat || event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+      }
+
+      const target = event.target as HTMLElement | null;
+      const tagName = target?.tagName;
+      const isInteractiveTarget =
+        target?.isContentEditable ||
+        tagName === "BUTTON" ||
+        tagName === "INPUT" ||
+        tagName === "SELECT" ||
+        tagName === "TEXTAREA" ||
+        !!target?.closest("a, button, input, select, textarea, [role='button']");
+
+      if (isInteractiveTarget) {
+        return;
+      }
+
+      event.preventDefault();
+      void togglePlaybackRef.current();
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   const displayTrack = track ?? {
     trackName: "Fortress of Lies",
@@ -158,7 +198,7 @@ export function SoundtrackDock() {
             </div>
             <button
               className="soundtrack-dock__button soundtrack-dock__play"
-              onClick={handlePlayPause}
+              onClick={() => void togglePlayback()}
               type="button"
               aria-label={isPlaying ? "pause" : "play"}
               disabled={!track?.previewUrl}

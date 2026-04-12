@@ -15,6 +15,7 @@ export type OsuFriend = {
   countryName: string | null;
   globalRank: number | null;
   modeRanks?: OsuModeRanks;
+  mutual: boolean;
   osuId: number;
   username: string;
 };
@@ -37,6 +38,7 @@ export type FriendSnapshot = {
   totals: {
     countryCount: number;
     friendCount: number;
+    mutualCount: number;
   };
 };
 

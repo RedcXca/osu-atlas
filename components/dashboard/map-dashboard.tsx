@@ -1,34 +1,36 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
-import { LeftDrawer } from "@/components/layout/left-drawer";
-import { RightDrawer } from "@/components/layout/right-drawer";
-import { SiteHeader } from "@/components/layout/site-header";
-import { WorldMap } from "@/components/map/world-map";
-
-const AtlasGlobe = dynamic(
-  () => import("@/components/globe/atlas-globe").then((m) => m.AtlasGlobe),
-  { ssr: false }
-);
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { MapPanel } from "@/components/dashboard/map-panel";
 import { BootSequence } from "@/components/fx/boot-sequence";
-import { ChromaticAberration } from "@/components/fx/chromatic-aberration";
-import { CircuitOverlay } from "@/components/fx/circuit-overlay";
-import { FloatingMarquee } from "@/components/fx/floating-marquee";
-import { GithubToast } from "@/components/fx/github-toast";
-import { ScanLines } from "@/components/fx/scan-lines";
-import { UiSoundProvider } from "@/components/fx/ui-sound-provider";
-import { Vignette } from "@/components/fx/vignette";
 import { LanguageProvider } from "@/lib/i18n/context";
-import { playClick, playDeselect, playHover, playSelect } from "@/lib/audio/ui-sounds";
-import { sortCountryBuckets, sortFriends } from "@/lib/domain/friend-snapshot";
+import { playDeselect, playSelect } from "@/lib/audio/ui-sounds";
 import type {
+  CountryFriendBucket,
   CountrySortMode,
   FriendSortMode,
   FriendSnapshot,
   OsuViewer,
   WorldMapCountry
 } from "@/lib/models";
+
+const DashboardChrome = dynamic(
+  () => import("@/components/dashboard/dashboard-chrome").then((m) => m.DashboardChrome),
+  { ssr: false, loading: () => null }
+);
+const LeftDrawer = dynamic(
+  () => import("@/components/layout/left-drawer").then((m) => m.LeftDrawer),
+  { ssr: false, loading: () => null }
+);
+const SiteHeader = dynamic(
+  () => import("@/components/layout/site-header").then((m) => m.SiteHeader),
+  { ssr: false, loading: () => null }
+);
+const DashboardFx = dynamic(
+  () => import("@/components/dashboard/dashboard-fx").then((m) => m.DashboardFx),
+  { ssr: false, loading: () => null }
+);
 
 
 type MapDashboardProps = {
@@ -60,62 +62,46 @@ export function MapDashboard({
     return navigator.hardwareConcurrency != null && navigator.hardwareConcurrency <= 4;
   });
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
-  const [hoveredCode, setHoveredCode] = useState<string | null>(null);
   const [bootEntered, setBootEntered] = useState(!hasWebGL);
   const [globeReady, setGlobeReady] = useState(!hasWebGL);
   const [countrySortMode, setCountrySortMode] = useState<CountrySortMode>("count");
   const [friendSortMode, setFriendSortMode] = useState<FriendSortMode>("alphabetical");
+  const [mutualOnly, setMutualOnly] = useState(false);
   const [query, setQuery] = useState("");
-  const deferredQuery = useDeferredValue(query);
+
+  // when mutual-only is active, rebuild snapshot with only mutual friends
+  const effectiveSnapshot = useMemo(() => {
+    if (!mutualOnly) return snapshot;
+    const countries: Record<string, CountryFriendBucket> = {};
+    for (const [code, bucket] of Object.entries(snapshot.countries)) {
+      const friends = bucket.friends.filter((f) => f.mutual);
+      if (friends.length > 0) {
+        countries[code] = { ...bucket, count: friends.length, friends };
+      }
+    }
+    const friendCount = Object.values(countries).reduce((sum, b) => sum + b.count, 0);
+    return {
+      ...snapshot,
+      countries,
+      totals: { countryCount: Object.keys(countries).length, friendCount, mutualCount: friendCount }
+    };
+  }, [mutualOnly, snapshot]);
+
+  const effectiveMapCountries = useMemo(() => {
+    if (!mutualOnly) return mapCountries;
+    return mapCountries.map((mc) => {
+      const count = effectiveSnapshot.countries[mc.code ?? ""]?.count ?? 0;
+      return { ...mc, count, hasFriends: count > 0 };
+    });
+  }, [effectiveSnapshot, mapCountries, mutualOnly]);
 
   // refs so callbacks stay stable across renders
   const selectedCodeRef = useRef(selectedCode);
   selectedCodeRef.current = selectedCode;
-  const hoveredCodeRef = useRef(hoveredCode);
-  hoveredCodeRef.current = hoveredCode;
-  const globeReadyRef = useRef(globeReady);
-  globeReadyRef.current = globeReady;
 
   useEffect(() => {
     setQuery("");
   }, [selectedCode]);
-
-  const visibleCountries = useMemo(
-    () =>
-      sortCountryBuckets(snapshot.countries, countrySortMode).filter(
-        (country) => country.code !== "UNKNOWN"
-      ),
-    [countrySortMode, snapshot.countries]
-  );
-
-  const selectedCountry = useMemo(() => {
-    if (!selectedCode) {
-      return null;
-    }
-
-    return (
-      snapshot.countries[selectedCode] ?? {
-        code: selectedCode,
-        count: 0,
-        friends: [],
-        name: mapCountries.find((country) => country.code === selectedCode)?.name ?? selectedCode
-      }
-    );
-  }, [mapCountries, selectedCode, snapshot.countries]);
-  const normalizedQuery = deferredQuery.trim().toLowerCase();
-  const visibleFriends = useMemo(() => {
-    if (!selectedCountry) {
-      return [];
-    }
-
-    const matchingFriends = !normalizedQuery
-      ? selectedCountry.friends
-      : selectedCountry.friends.filter((friend) =>
-      friend.username.toLowerCase().includes(normalizedQuery)
-    );
-
-    return sortFriends(matchingFriends, friendSortMode);
-  }, [friendSortMode, normalizedQuery, selectedCountry]);
 
   const handleSelectCountry = useCallback((code: string | null) => {
     if (code) {
@@ -126,75 +112,60 @@ export function MapDashboard({
     setSelectedCode(code);
   }, []);
 
-  const handleHoverCountry = useCallback((code: string | null) => {
-    if (code && code !== hoveredCodeRef.current && globeReadyRef.current) {
-      playHover();
-    }
-    setHoveredCode(code);
-  }, []);
-
   const handleGlobeReady = useCallback(() => setGlobeReady(true), []);
+  const handleBootEnter = useCallback(() => setBootEntered(true), []);
 
   return (
     <LanguageProvider>
-      <BootSequence lowPerf={lowPerf} onEnter={() => setBootEntered(true)} skip={!hasWebGL}>
+      <BootSequence lowPerf={lowPerf} onEnter={handleBootEnter} skip={!hasWebGL}>
         <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
-          <SiteHeader viewer={viewer} />
+          {bootEntered && <SiteHeader viewer={viewer} />}
           <section className="dashboard-grid">
-            <LeftDrawer
-              authMessage={authMessage}
-              demoMode={demoMode}
-              onFriendSortModeChange={setFriendSortMode}
-              onSelectCountry={handleSelectCountry}
-              snapshot={snapshot}
-              viewer={viewer}
-            />
-            {!hasWebGL ? (
-              <WorldMap
-                hoveredCode={hoveredCode}
-                mapCountries={mapCountries}
-                unknownCount={snapshot.countries["UNKNOWN"]?.count ?? 0}
-                onHoverChange={handleHoverCountry}
+            {bootEntered && (
+              <LeftDrawer
+                authMessage={authMessage}
+                demoMode={demoMode}
+                mutualOnly={mutualOnly}
+                onFriendSortModeChange={setFriendSortMode}
+                onMutualOnlyChange={setMutualOnly}
                 onSelectCountry={handleSelectCountry}
-                selectedCode={selectedCode}
-              />
-            ) : (
-              <AtlasGlobe
-                bootEntered={bootEntered}
-                hoveredCode={hoveredCode}
-                mapCountries={mapCountries}
-                onGlobeReady={handleGlobeReady}
-                onHoverChange={handleHoverCountry}
-                onSelectCountry={handleSelectCountry}
-                selectedCode={selectedCode}
+                snapshot={effectiveSnapshot}
+                viewer={viewer}
               />
             )}
-            <RightDrawer
-              countries={visibleCountries}
-              countrySortMode={countrySortMode}
-              filteredFriends={visibleFriends}
-              onCountrySortModeChange={setCountrySortMode}
-              onFriendSortModeChange={setFriendSortMode}
-              onQueryChange={setQuery}
+            <MapPanel
+              bootEntered={bootEntered}
+              globeReady={globeReady}
+              hasWebGL={hasWebGL}
+              mapCountries={effectiveMapCountries}
+              onGlobeReady={handleGlobeReady}
               onSelectCountry={handleSelectCountry}
-              friendSortMode={friendSortMode}
-              query={query}
-              selectedCountry={selectedCountry}
-              totalFriends={snapshot.totals.friendCount}
+              selectedCode={selectedCode}
+              unknownCount={effectiveSnapshot.countries["UNKNOWN"]?.count ?? 0}
             />
+            {bootEntered && (
+              <DashboardChrome
+                countrySortMode={countrySortMode}
+                friendSortMode={friendSortMode}
+                mapCountries={effectiveMapCountries}
+                onCountrySortModeChange={setCountrySortMode}
+                onFriendSortModeChange={setFriendSortMode}
+                onQueryChange={setQuery}
+                onSelectCountry={handleSelectCountry}
+                query={query}
+                selectedCode={selectedCode}
+                snapshot={effectiveSnapshot}
+              />
+            )}
           </section>
         </div>
-        <FloatingMarquee
-          friendCount={snapshot.totals.friendCount}
-          countryCount={snapshot.totals.countryCount}
-          username={viewer?.username ?? "demo"}
-        />
-        <GithubToast />
-        <UiSoundProvider />
-        <CircuitOverlay />
-        <ChromaticAberration />
-        <ScanLines />
-        <Vignette />
+        {globeReady && (
+          <DashboardFx
+            countryCount={effectiveSnapshot.totals.countryCount}
+            friendCount={effectiveSnapshot.totals.friendCount}
+            username={viewer?.username ?? "demo"}
+          />
+        )}
       </BootSequence>
     </LanguageProvider>
   );
