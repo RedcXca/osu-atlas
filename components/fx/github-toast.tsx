@@ -11,26 +11,18 @@ export function GithubToast() {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  // wait for boot to finish before showing
+  // DashboardFx only mounts once the globe is ready, so we can show on mount
   useEffect(() => {
-    let showTimer: ReturnType<typeof setTimeout>;
-    let dismissTimer: ReturnType<typeof setTimeout>;
-
-    function onBootEnter() {
-      showTimer = setTimeout(() => {
-        setVisible(true);
-        playNotification();
-      }, SHOW_DELAY);
-      dismissTimer = setTimeout(() => {
-        setVisible(false);
-        setDismissed(true);
-      }, SHOW_DELAY + AUTO_DISMISS);
-    }
-
-    window.addEventListener("nier-boot-enter", onBootEnter);
+    const showTimer = setTimeout(() => {
+      setVisible(true);
+      playNotification();
+    }, SHOW_DELAY);
+    const dismissTimer = setTimeout(() => {
+      setVisible(false);
+      setDismissed(true);
+    }, SHOW_DELAY + AUTO_DISMISS);
 
     return () => {
-      window.removeEventListener("nier-boot-enter", onBootEnter);
       clearTimeout(showTimer);
       clearTimeout(dismissTimer);
     };
