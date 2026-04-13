@@ -1,6 +1,7 @@
 import type { Feature, FeatureCollection, MultiPolygon, Polygon } from "geojson";
 import { feature } from "topojson-client";
-import worldAtlas from "world-atlas/countries-50m.json";
+import worldAtlas110m from "world-atlas/countries-110m.json";
+import worldAtlas50m from "world-atlas/countries-50m.json";
 import worldCountries from "world-countries";
 
 type AtlasCountryProperties = {
@@ -50,10 +51,24 @@ export const countryNameByNumericId = buildNumericCountryMap(
   (country) => country.name.common ?? null
 );
 
-export const worldCountryFeatureCollection = feature(
-  worldAtlas as never,
-  (worldAtlas as { objects: { countries: unknown } }).objects.countries as never
+// use low-res 110m as base, patch in 50m geometry for small countries that got dropped
+const features110m = feature(
+  worldAtlas110m as never,
+  (worldAtlas110m as { objects: { countries: unknown } }).objects.countries as never
 ) as unknown as WorldGeoFeatureCollection;
+
+const features50m = feature(
+  worldAtlas50m as never,
+  (worldAtlas50m as { objects: { countries: unknown } }).objects.countries as never
+) as unknown as WorldGeoFeatureCollection;
+
+const ids110m = new Set(features110m.features.map((f) => String(f.id)));
+const missingFeatures = features50m.features.filter((f) => !ids110m.has(String(f.id)));
+
+export const worldCountryFeatureCollection: WorldGeoFeatureCollection = {
+  ...features110m,
+  features: [...features110m.features, ...missingFeatures]
+};
 
 export function getCountryCodeFromFeature(
   countryFeature: Pick<WorldGeoFeature, "id" | "properties"> | null | undefined

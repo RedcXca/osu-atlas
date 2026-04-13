@@ -98,10 +98,6 @@ export function AtlasGlobe({
   selectedCode
 }: Readonly<AtlasGlobeProps>) {
   const { locale, t } = useLanguage();
-  const [lowPerfMode] = useState(() => {
-    if (typeof navigator === "undefined") return false;
-    return navigator.hardwareConcurrency != null && navigator.hardwareConcurrency <= 4;
-  });
   const globeRef = useRef<any>(null);
   const [globeReady, setGlobeReady] = useState(false);
   const globeReadyRef = useRef(false);
@@ -279,12 +275,6 @@ export function AtlasGlobe({
       return;
     }
 
-    // cap pixel ratio on weak hardware to reduce GPU load
-    const renderer = globe.renderer();
-    if (renderer && lowPerfMode) {
-      renderer.setPixelRatio(1);
-    }
-
     controls.autoRotate = true;
     controls.autoRotateSpeed = 0.28;
     controls.enableZoom = true;
@@ -355,7 +345,7 @@ export function AtlasGlobe({
     const scene = globe.scene();
     if (!scene) return;
 
-    const starCount = lowPerfMode ? 400 : 1600;
+    const starCount = 1600;
     const positions = new Float32Array(starCount * 3);
     const opacities = new Float32Array(starCount);
 
@@ -385,7 +375,7 @@ export function AtlasGlobe({
     scene.add(stars);
 
     // floating wireframe cubes scattered in space
-    const cubeCount = lowPerfMode ? 6 : 20;
+    const cubeCount = 20;
     const cubeGroup = new Group();
     const cubeGeo = new BoxGeometry(1, 1, 1);
     const cubeMat = new MeshBasicMaterial({
@@ -472,7 +462,7 @@ export function AtlasGlobe({
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, 64, 64);
     const glowTexture = new CanvasTexture(glowCanvas);
-    const fgCount = lowPerfMode ? 0 : 40;
+    const fgCount = 40;
     const fgPositions = new Float32Array(fgCount * 3);
 
     for (let i = 0; i < fgCount; i++) {
@@ -547,9 +537,8 @@ export function AtlasGlobe({
     };
   }, [globeReady]);
 
-  // post-processing — chromatic aberration only (skipped on low-end hardware)
+  // post-processing — chromatic aberration
   useEffect(() => {
-    if (lowPerfMode) return;
     if (!globeReady) return;
     const globe = globeRef.current;
     if (!globe) return;

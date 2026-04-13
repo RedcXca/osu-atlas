@@ -57,10 +57,6 @@ export function MapDashboard({
       return false;
     }
   });
-  const [lowPerf] = useState(() => {
-    if (typeof navigator === "undefined") return false;
-    return navigator.hardwareConcurrency != null && navigator.hardwareConcurrency <= 4;
-  });
   const [selectedCode, setSelectedCode] = useState<string | null>(null);
   const [bootEntered, setBootEntered] = useState(!hasWebGL);
   const [globeReady, setGlobeReady] = useState(!hasWebGL);
@@ -118,7 +114,7 @@ export function MapDashboard({
 
   return (
     <LanguageProvider>
-      <BootSequence lowPerf={lowPerf} onEnter={handleBootEnter} skip={!hasWebGL}>
+      <BootSequence onEnter={handleBootEnter} skip={!hasWebGL} username={viewer?.username}>
         <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
           {bootEntered && (
             <SiteHeader

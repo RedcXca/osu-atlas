@@ -3,15 +3,14 @@
 import { useEffect, useState } from "react";
 import { playGlitch } from "@/lib/audio/ui-sounds";
 
-function getBootLines(lowPerf: boolean) {
-  const lines = [
+function getBootLines(username: string | null) {
+  return [
     "[SYSTEM] Initializing terminal...",
     "[SYSTEM] Loading geographic data...",
     "[SYSTEM] Establishing connection to osu! network...",
-    `[SYSTEM] Render mode: ${lowPerf ? "LOW — reduced effects" : "FULL"}`,
+    ...(username ? [`[SYSTEM] Logged in as ${username}`] : []),
     "[SYSTEM] Operator interface ready."
   ];
-  return lines;
 }
 
 const LINE_DELAY = 320;
@@ -20,13 +19,13 @@ const FADE_DELAY = 1800;
 
 type BootSequenceProps = {
   children: React.ReactNode;
-  lowPerf?: boolean;
   onEnter?: () => void;
   skip?: boolean;
+  username?: string | null;
 };
 
-export function BootSequence({ children, lowPerf, onEnter, skip }: BootSequenceProps) {
-  const bootLines = getBootLines(!!lowPerf);
+export function BootSequence({ children, onEnter, skip, username }: BootSequenceProps) {
+  const bootLines = getBootLines(username ?? null);
   const [phase, setPhase] = useState<"boot" | "waiting" | "glitch" | "fade" | "done">(skip ? "done" : "boot");
   const [visibleLines, setVisibleLines] = useState(skip ? 0 : 1);
 
