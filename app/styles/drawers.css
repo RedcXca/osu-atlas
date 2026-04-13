@@ -413,17 +413,7 @@
     14px 100%,
     0 calc(100% - 14px)
   );
-  animation: country-brief-in 500ms var(--ease-nier);
-}
-
-.country-brief::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(90deg, transparent, rgba(218, 212, 204, 0.06), transparent);
-  transform: translateX(-100%);
-  animation: country-brief-sweep 900ms var(--ease-nier);
+  animation: country-brief-in 260ms var(--ease-nier);
 }
 
 .country-brief__meta {
@@ -571,31 +561,12 @@
 @keyframes country-brief-in {
   from {
     opacity: 0;
-    transform: translateX(12px);
-    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%, 0 100%, 0 100%);
+    transform: translateX(4px);
   }
 
   to {
     opacity: 1;
     transform: translateX(0);
-    clip-path: polygon(
-      0 0,
-      calc(100% - 14px) 0,
-      100% 14px,
-      100% 100%,
-      14px 100%,
-      0 calc(100% - 14px)
-    );
-  }
-}
-
-@keyframes country-brief-sweep {
-  from {
-    transform: translateX(-100%);
-  }
-
-  to {
-    transform: translateX(100%);
   }
 }
 

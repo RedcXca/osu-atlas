@@ -862,8 +862,9 @@ export function AtlasGlobe({
       <div
         className="globe-frame"
         onClick={(e) => {
-          // only fire when clicking the background, not bubbled from globe internals
-          if (e.target === e.currentTarget || (e.target as HTMLElement).tagName === "CANVAS") {
+          // only deselect when clicking the frame padding, not the canvas —
+          // the canvas has its own three.js handlers (onPolygonClick / onGlobeClick)
+          if (e.target === e.currentTarget) {
             onSelectCountry(null);
             handleInteraction();
           }
