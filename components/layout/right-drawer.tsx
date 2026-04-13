@@ -62,7 +62,7 @@ export const RightDrawer = memo(function RightDrawer({
             <div className="country-brief" key={selectedCountry.code}>
               <div className="country-brief__meta">
                 <span className="country-brief__kicker">REGION // SCAN</span>
-                <span className="country-brief__code">{selectedCountry.code.toUpperCase()}</span>
+                <span className="country-brief__code">{(selectedCountry.code ?? "").toUpperCase()}</span>
               </div>
               <div className="country-brief__row">
                 <div className="country-brief__flag">
@@ -70,17 +70,17 @@ export const RightDrawer = memo(function RightDrawer({
                 </div>
                 <div className="country-brief__body">
                   <h2 className="country-brief__name" suppressHydrationWarning>
-                    {localizedCountryName}
+                    {localizedCountryName || selectedCountry.name || selectedCountry.code}
                   </h2>
                   <div className="country-brief__stats">
                     <span className="country-brief__stat">
                       <span className="country-brief__stat-label">TARGETS</span>
-                      <strong>{selectedCountry.count}</strong>
+                      <strong>{selectedCountry.count ?? 0}</strong>
                     </span>
                     <span className="country-brief__divider" />
                     <span className="country-brief__stat">
                       <span className="country-brief__stat-label">CODE</span>
-                      <strong>{selectedCountry.code}</strong>
+                      <strong>{selectedCountry.code || "??"}</strong>
                     </span>
                   </div>
                 </div>
