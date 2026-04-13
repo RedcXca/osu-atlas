@@ -33,7 +33,6 @@ const DEFAULT_AVATAR = "https://osu.ppy.sh/images/layout/avatar-guest@2x.png";
 
 type LeftDrawerProps = {
   authMessage: string | null;
-  demoMode: boolean;
   onFriendSortModeChange: (mode: OsuGameMode) => void;
   onSelectCountry: (code: string | null) => void;
   snapshot: FriendSnapshot;
@@ -109,7 +108,6 @@ function Transmission({ onClose }: Readonly<{ onClose: () => void }>) {
 
 export const LeftDrawer = memo(function LeftDrawer({
   authMessage,
-  demoMode,
   onFriendSortModeChange,
   onSelectCountry,
   snapshot,
@@ -354,7 +352,6 @@ function areLeftDrawerPropsEqual(
 ) {
   return (
     previousProps.authMessage === nextProps.authMessage &&
-    previousProps.demoMode === nextProps.demoMode &&
     previousProps.onFriendSortModeChange === nextProps.onFriendSortModeChange &&
     previousProps.onSelectCountry === nextProps.onSelectCountry &&
     previousProps.snapshot.countries === nextProps.snapshot.countries &&

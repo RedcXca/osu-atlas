@@ -12,7 +12,6 @@ type SearchParamValue = string | string[] | undefined;
 
 export type HomePageData = {
   authMessage: string | null;
-  demoMode: boolean;
   mapCountries: WorldMapCountry[];
   snapshot: FriendSnapshot;
   viewer: OsuViewer | null;
@@ -47,7 +46,6 @@ export async function readHomePageData(
 
   return {
     authMessage,
-    demoMode: !viewer,
     mapCountries: getProjectedWorldCountries(snapshot.countries),
     snapshot,
     viewer

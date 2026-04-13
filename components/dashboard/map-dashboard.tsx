@@ -35,7 +35,6 @@ const DashboardFx = dynamic(
 
 type MapDashboardProps = {
   authMessage: string | null;
-  demoMode: boolean;
   mapCountries: WorldMapCountry[];
   snapshot: FriendSnapshot;
   viewer: OsuViewer | null;
@@ -43,7 +42,6 @@ type MapDashboardProps = {
 
 export function MapDashboard({
   authMessage,
-  demoMode,
   mapCountries,
   snapshot,
   viewer
@@ -125,12 +123,11 @@ export function MapDashboard({
           )}
           <section className="dashboard-grid">
             {bootEntered && (
-              <LeftDrawer
-                authMessage={authMessage}
-                demoMode={demoMode}
-                onFriendSortModeChange={setFriendSortMode}
-                onSelectCountry={handleSelectCountry}
-                snapshot={effectiveSnapshot}
+            <LeftDrawer
+              authMessage={authMessage}
+              onFriendSortModeChange={setFriendSortMode}
+              onSelectCountry={handleSelectCountry}
+              snapshot={effectiveSnapshot}
                 viewer={viewer}
               />
             )}

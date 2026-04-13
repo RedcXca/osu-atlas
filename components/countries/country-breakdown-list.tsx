@@ -19,7 +19,7 @@ export function CountryBreakdownList({
 
   return (
     <div className="country-breakdown-list">
-      {countries.map((country, index) => {
+      {countries.map((country) => {
         const share = Math.round((country.count / Math.max(totalFriends, 1)) * 100);
         const barStyle = {
           "--country-share": `${Math.max(share, 4)}%`

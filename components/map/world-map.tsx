@@ -233,8 +233,7 @@ export function WorldMap({
 
   return (
     <section className="panel map-panel">
-      <div className="map-shell">
-        <div className="map-frame" data-dragging={isDragging} data-zoomed={isZoomed}>
+      <div className="map-frame" data-dragging={isDragging} data-zoomed={isZoomed}>
           <div className="map-controls" onPointerDown={stopMapControlPointer}>
             <button
               aria-label={t.zoomIn}
@@ -367,7 +366,6 @@ export function WorldMap({
               </div>
             </div>
           ) : null}
-        </div>
       </div>
     </section>
   );

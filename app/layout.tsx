@@ -1,21 +1,21 @@
 import type { Metadata, Viewport } from "next";
-import { DM_Sans, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Share_Tech_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-inter",
   display: "swap",
   weight: ["400", "500", "600", "700"]
 });
 
-const plusJakarta = Plus_Jakarta_Sans({
+const shareTechMono = Share_Tech_Mono({
   subsets: ["latin"],
-  variable: "--font-plus-jakarta",
+  variable: "--font-share-tech-mono",
   display: "swap",
-  weight: ["600", "700", "800"]
+  weight: "400"
 });
 
 export const metadata: Metadata = {
@@ -52,7 +52,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${plusJakarta.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${shareTechMono.variable}`} suppressHydrationWarning>
       <body>
         <div id="ssr-boot" className="fx-boot" aria-hidden="true">
           <div className="fx-boot__terminal">

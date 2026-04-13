@@ -1,0 +1,168 @@
+:root {
+  --bg-page: #0c0c10;
+  --bg-panel: rgba(22, 22, 28, 0.45);
+  --bg-panel-strong: rgba(32, 32, 40, 0.5);
+  --bg-elevated: rgba(28, 28, 36, 0.75);
+  --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.22);
+  --text: #f4f2ef;
+  --text-dim: rgba(244, 242, 239, 0.65);
+  --text-muted: rgba(244, 242, 239, 0.42);
+  --accent: #dad4cc;
+  --accent-glow: rgba(218, 212, 204, 0.18);
+  --accent-soft: rgba(218, 212, 204, 0.1);
+  --accent-soft-strong: rgba(218, 212, 204, 0.18);
+  --danger: #8a6060;
+
+  --chamfer-lg: 16px;
+  --chamfer-md: 10px;
+  --chamfer-sm: 6px;
+
+  --clip-lg: polygon(
+    var(--chamfer-lg) 0,
+    100% 0,
+    100% calc(100% - var(--chamfer-lg)),
+    calc(100% - var(--chamfer-lg)) 100%,
+    0 100%,
+    0 var(--chamfer-lg)
+  );
+  --clip-md: polygon(
+    var(--chamfer-md) 0,
+    100% 0,
+    100% calc(100% - var(--chamfer-md)),
+    calc(100% - var(--chamfer-md)) 100%,
+    0 100%,
+    0 var(--chamfer-md)
+  );
+  --clip-sm: polygon(
+    var(--chamfer-sm) 0,
+    100% 0,
+    100% calc(100% - var(--chamfer-sm)),
+    calc(100% - var(--chamfer-sm)) 100%,
+    0 100%,
+    0 var(--chamfer-sm)
+  );
+
+  --font-body: var(--font-inter), "Arial", sans-serif;
+  --font-mono: var(--font-share-tech-mono), "Courier New", monospace;
+
+  --ease-nier: cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-base: 200ms var(--ease-nier);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: dark;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  margin: 0;
+  color: var(--text);
+  background: #08080c;
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: rgba(200, 192, 184, 0.3);
+  color: #fff;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.page-shell {
+  position: relative;
+  height: 100vh;
+  padding: 24px;
+  overflow: hidden;
+}
+
+.panel {
+  position: relative;
+  overflow: visible;
+  border: 1px solid var(--line);
+  background: var(--bg-panel);
+  backdrop-filter: blur(8px) saturate(0.3);
+  box-shadow:
+    1px 0 0 rgba(255, 60, 60, 0.04),
+    -1px 0 0 rgba(60, 60, 255, 0.04);
+}
+
+.panel::after {
+  display: none;
+}
+
+.country-flag {
+  display: inline-block;
+  vertical-align: middle;
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    0 0 6px rgba(200, 192, 184, 0.15);
+  filter: saturate(0.45) brightness(0.85) contrast(1.1);
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.country-flag:hover {
+  filter: saturate(0.7) brightness(1);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 0 10px rgba(200, 192, 184, 0.3);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 1400px) {
+  html,
+  body {
+    height: auto;
+    overflow: auto;
+  }
+
+  .page-shell {
+    height: auto;
+    min-height: 100vh;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 860px) {
+  .page-shell {
+    padding: 14px;
+  }
+}

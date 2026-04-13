@@ -1,0 +1,202 @@
+.friend-list,
+.country-breakdown-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.friend-card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  overflow: hidden;
+  padding: 12px;
+}
+
+.friend-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(218, 212, 204, 0.04) 50%,
+    transparent 60%
+  );
+  background-size: 250% 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.friend-card:hover::before {
+  opacity: 1;
+  animation: row-shimmer 1s ease-out forwards;
+}
+
+.friend-card__avatar {
+  border: 1px solid var(--line);
+  clip-path: var(--clip-sm);
+  filter: saturate(0.5) brightness(0.85);
+}
+
+.friend-card__meta {
+  min-width: 0;
+}
+
+.friend-card__meta strong {
+  display: block;
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-card__meta span {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.friend-card__link {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  clip-path: var(--clip-sm);
+  padding: 0 10px;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  transition: border-color var(--transition-base), color var(--transition-base);
+}
+
+.friend-card__link:hover {
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.country-breakdown-row {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 36px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.country-breakdown-row::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    rgba(218, 212, 204, 0.06) 50%,
+    transparent 60%
+  );
+  background-size: 250% 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+
+.country-breakdown-row:hover,
+.country-breakdown-row:focus-visible {
+  border-color: var(--accent);
+  background: linear-gradient(180deg, rgba(200, 192, 184, 0.06), rgba(0, 0, 0, 0.08));
+  box-shadow: 0 0 12px rgba(218, 212, 204, 0.04);
+  outline: none;
+}
+
+.country-breakdown-row:hover::before {
+  opacity: 1;
+  animation: row-shimmer 1.2s ease-out forwards;
+}
+
+.country-breakdown-row__rank {
+  display: inline-grid;
+  width: 36px;
+  height: 36px;
+  place-items: center;
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.country-breakdown-row__body {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.country-breakdown-row__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.country-breakdown-row__meta strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  font-weight: 400;
+}
+
+.country-breakdown-row__meta span {
+  color: var(--text-dim);
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+
+.country-breakdown-row__bar {
+  position: relative;
+  display: block;
+  height: 2px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.country-breakdown-row__bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: var(--country-share);
+  background: linear-gradient(90deg, rgba(200, 192, 184, 0.4), rgba(232, 230, 227, 0.2));
+}
+
+@keyframes row-shimmer {
+  from {
+    background-position-x: 100%;
+  }
+
+  to {
+    background-position-x: -100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .friend-card {
+    grid-template-columns: 52px minmax(0, 1fr);
+  }
+
+  .friend-card__link {
+    grid-column: 1 / -1;
+  }
+}
