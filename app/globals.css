@@ -723,10 +723,6 @@ img {
   font-size: 1rem;
 }
 
-.left-drawer__mutual-toggle {
-  margin: 2px 0 -2px;
-}
-
 .left-drawer__country-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1750,6 +1746,34 @@ button.mode-rank-card:hover {
   border-color: var(--accent);
 }
 
+.nier-toggle--subtle .nier-toggle__track {
+  width: 28px;
+  height: 14px;
+  border-color: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.nier-toggle--subtle .nier-toggle__thumb {
+  width: 8px;
+  height: 8px;
+  top: 2px;
+  left: 2px;
+  background: var(--text-muted);
+}
+
+.nier-toggle--subtle input:checked + .nier-toggle__track .nier-toggle__thumb {
+  transform: translateX(14px);
+}
+
+.nier-toggle--subtle .nier-toggle__label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}
+
+.nier-toggle--subtle input:checked ~ .nier-toggle__label {
+  color: var(--text-dim);
+}
+
 /* ──────────────────────────────────────
    country breakdown list
    ────────────────────────────────────── */
@@ -1839,6 +1863,59 @@ button.mode-rank-card:hover {
   width: var(--country-share);
   background: linear-gradient(90deg, rgba(200, 192, 184, 0.4), rgba(232, 230, 227, 0.2));
   content: "";
+}
+
+/* ──────────────────────────────────────
+   header toggle
+   ────────────────────────────────────── */
+
+.header-toggle {
+  display: inline-flex;
+  height: 40px;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  clip-path: var(--clip-sm);
+  padding: 0 14px;
+  background: rgba(10, 10, 12, 0.6);
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: border-color var(--transition-base), color var(--transition-base), background var(--transition-base);
+}
+
+.header-toggle:hover,
+.header-toggle:focus-visible {
+  border-color: var(--line-strong);
+  color: var(--text-dim);
+  outline: none;
+}
+
+.header-toggle[data-active="true"] {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(200, 192, 184, 0.06);
+}
+
+.header-toggle__check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--line-strong);
+  clip-path: var(--clip-sm);
+  font-size: 0.6rem;
+  line-height: 1;
+  transition: border-color var(--transition-base), background var(--transition-base);
+}
+
+.header-toggle[data-active="true"] .header-toggle__check {
+  border-color: var(--accent);
+  background: rgba(200, 192, 184, 0.12);
 }
 
 /* ──────────────────────────────────────

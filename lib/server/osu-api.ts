@@ -239,27 +239,55 @@ function toOsuFriend(user: OsuApiUser, mutual = false): OsuFriend {
   };
 }
 
-export async function fetchFriends(accessToken: string): Promise<OsuFriend[]> {
-  const payload = await osuApiFetch<unknown>("/api/v2/friends", accessToken);
-  const rawFriends = coerceUsersFromFriendsResponse(payload);
+// api version ≥20241022 returns UserRelation[] with { target_id, mutual, target: UserCompact }
+// older versions return flat UserCompact[] without mutual info
+type FriendsRelationEntry = {
+  mutual?: boolean;
+  target?: OsuApiUser;
+  target_id?: number;
+};
 
-  // capture mutual status from the raw /friends response before hydration
-  // the api returns { mutual: boolean, ... } per relation entry
+export async function fetchFriends(accessToken: string): Promise<OsuFriend[]> {
+  // request the new response format that includes mutual status
+  const response = await fetch(`${OSU_BASE_URL}/api/v2/friends`, {
+    cache: "no-store",
+    headers: {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+      "x-api-version": "20241022"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`osu! API error ${response.status}: ${response.statusText}`);
+  }
+
+  const payload = (await response.json()) as unknown;
+  const relations = Array.isArray(payload) ? (payload as FriendsRelationEntry[]) : [];
+
+  // extract mutual status and user objects from the relation entries
   const mutualById = new Map<number, boolean>();
-  if (Array.isArray(payload)) {
-    for (const entry of payload as { id?: number; target_id?: number; mutual?: boolean }[]) {
-      const id = entry.id ?? entry.target_id;
-      if (id != null) mutualById.set(id, entry.mutual === true);
+  const rawUsers: OsuApiUser[] = [];
+
+  for (const entry of relations) {
+    const id = entry.target_id ?? (entry as unknown as OsuApiUser).id;
+    if (id != null) {
+      mutualById.set(id, entry.mutual === true);
+    }
+    // new format nests user in target, old format has user fields at top level
+    const user = entry.target ?? (entry as unknown as OsuApiUser);
+    if (user?.id != null) {
+      rawUsers.push(user);
     }
   }
 
-  const uniqueFriendIds = [...new Set(rawFriends.map((friend) => friend.id))];
-  // hydrate per-ruleset ranks from the documented users endpoint instead of trusting /friends
-  const detailedFriends = await fetchUsersByIds(accessToken, uniqueFriendIds);
-  const detailedFriendsById = new Map(detailedFriends.map((friend) => [friend.id, friend]));
+  const uniqueIds = [...new Set(rawUsers.map((u) => u.id))];
+  // hydrate per-ruleset ranks from the documented users endpoint
+  const detailedUsers = await fetchUsersByIds(accessToken, uniqueIds);
+  const detailedById = new Map(detailedUsers.map((u) => [u.id, u]));
 
-  return rawFriends.map((friend) =>
-    toOsuFriend(detailedFriendsById.get(friend.id) ?? friend, mutualById.get(friend.id) ?? false)
+  return rawUsers.map((user) =>
+    toOsuFriend(detailedById.get(user.id) ?? user, mutualById.get(user.id) ?? false)
   );
 }
 

@@ -62,10 +62,12 @@ function HeaderHud() {
 }
 
 type SiteHeaderProps = {
+  mutualOnly: boolean;
+  onMutualOnlyChange: (value: boolean) => void;
   viewer: OsuViewer | null;
 };
 
-export const SiteHeader = memo(function SiteHeader({ viewer }: Readonly<SiteHeaderProps>) {
+export const SiteHeader = memo(function SiteHeader({ mutualOnly, onMutualOnlyChange, viewer }: Readonly<SiteHeaderProps>) {
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -120,6 +122,17 @@ export const SiteHeader = memo(function SiteHeader({ viewer }: Readonly<SiteHead
 
       <HeaderHud />
       <div className="site-header__actions">
+        <button
+          className="header-toggle"
+          data-active={mutualOnly}
+          onClick={() => onMutualOnlyChange(!mutualOnly)}
+          type="button"
+          role="checkbox"
+          aria-checked={mutualOnly}
+        >
+          <span className="header-toggle__check">{mutualOnly ? "✕" : ""}</span>
+          mutual only
+        </button>
         <LanguageSelector />
         {viewer ? (
           <div className="profile-menu" ref={menuRef}>

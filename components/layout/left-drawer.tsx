@@ -11,9 +11,7 @@ const DEFAULT_AVATAR = "https://osu.ppy.sh/images/layout/avatar-guest@2x.png";
 type LeftDrawerProps = {
   authMessage: string | null;
   demoMode: boolean;
-  mutualOnly: boolean;
   onFriendSortModeChange: (mode: OsuGameMode) => void;
-  onMutualOnlyChange: (value: boolean) => void;
   onSelectCountry: (code: string | null) => void;
   snapshot: FriendSnapshot;
   viewer: OsuViewer | null;
@@ -30,9 +28,7 @@ const MODE_LABELS: Record<OsuGameMode, string> = {
 export const LeftDrawer = memo(function LeftDrawer({
   authMessage,
   demoMode,
-  mutualOnly,
   onFriendSortModeChange,
-  onMutualOnlyChange,
   onSelectCountry,
   snapshot,
   viewer
@@ -135,18 +131,6 @@ export const LeftDrawer = memo(function LeftDrawer({
             </article>
           </div>
 
-          <label className="nier-toggle left-drawer__mutual-toggle">
-            <input
-              type="checkbox"
-              checked={mutualOnly}
-              onChange={(e) => onMutualOnlyChange(e.target.checked)}
-            />
-            <span className="nier-toggle__track">
-              <span className="nier-toggle__thumb" />
-            </span>
-            <span className="nier-toggle__label">mutual only</span>
-          </label>
-
           <div className="left-drawer__country-strip">
             <button
               className="left-drawer__country-pill"
@@ -244,9 +228,7 @@ function areLeftDrawerPropsEqual(
   return (
     previousProps.authMessage === nextProps.authMessage &&
     previousProps.demoMode === nextProps.demoMode &&
-    previousProps.mutualOnly === nextProps.mutualOnly &&
     previousProps.onFriendSortModeChange === nextProps.onFriendSortModeChange &&
-    previousProps.onMutualOnlyChange === nextProps.onMutualOnlyChange &&
     previousProps.onSelectCountry === nextProps.onSelectCountry &&
     previousProps.snapshot.countries === nextProps.snapshot.countries &&
     previousProps.snapshot.totals.friendCount === nextProps.snapshot.totals.friendCount &&

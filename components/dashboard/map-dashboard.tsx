@@ -74,7 +74,8 @@ export function MapDashboard({
     if (!mutualOnly) return snapshot;
     const countries: Record<string, CountryFriendBucket> = {};
     for (const [code, bucket] of Object.entries(snapshot.countries)) {
-      const friends = bucket.friends.filter((f) => f.mutual);
+      // treat undefined as mutual (old data without the field)
+      const friends = bucket.friends.filter((f) => f.mutual !== false);
       if (friends.length > 0) {
         countries[code] = { ...bucket, count: friends.length, friends };
       }
@@ -119,15 +120,19 @@ export function MapDashboard({
     <LanguageProvider>
       <BootSequence lowPerf={lowPerf} onEnter={handleBootEnter} skip={!hasWebGL}>
         <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
-          {bootEntered && <SiteHeader viewer={viewer} />}
+          {bootEntered && (
+            <SiteHeader
+              mutualOnly={mutualOnly}
+              onMutualOnlyChange={setMutualOnly}
+              viewer={viewer}
+            />
+          )}
           <section className="dashboard-grid">
             {bootEntered && (
               <LeftDrawer
                 authMessage={authMessage}
                 demoMode={demoMode}
-                mutualOnly={mutualOnly}
                 onFriendSortModeChange={setFriendSortMode}
-                onMutualOnlyChange={setMutualOnly}
                 onSelectCountry={handleSelectCountry}
                 snapshot={effectiveSnapshot}
                 viewer={viewer}
