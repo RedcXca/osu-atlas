@@ -59,11 +59,37 @@ export const RightDrawer = memo(function RightDrawer({
       <div className="drawer__body">
         {selectedCountry ? (
           <>
-            <div className="stack">
-              <h2 className="drawer__title drawer__title--proper" suppressHydrationWarning><CountryFlag code={selectedCountry.code} /> {localizedCountryName}</h2>
-              <p className="drawer__copy">
-                {t.friendCount(selectedCountry.count)}
-              </p>
+            <div className="country-brief" key={selectedCountry.code}>
+              <div className="country-brief__meta">
+                <span className="country-brief__kicker">REGION // SCAN</span>
+                <span className="country-brief__code">{selectedCountry.code.toUpperCase()}</span>
+              </div>
+              <div className="country-brief__row">
+                <div className="country-brief__flag">
+                  <CountryFlag code={selectedCountry.code} />
+                </div>
+                <div className="country-brief__body">
+                  <h2 className="country-brief__name" suppressHydrationWarning>
+                    {localizedCountryName}
+                  </h2>
+                  <div className="country-brief__stats">
+                    <span className="country-brief__stat">
+                      <span className="country-brief__stat-label">TARGETS</span>
+                      <strong>{selectedCountry.count}</strong>
+                    </span>
+                    <span className="country-brief__divider" />
+                    <span className="country-brief__stat">
+                      <span className="country-brief__stat-label">CODE</span>
+                      <strong>{selectedCountry.code}</strong>
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div className="country-brief__ticks" aria-hidden="true">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <span key={i} />
+                ))}
+              </div>
             </div>
 
             {selectedCountry.count > 0 ? (

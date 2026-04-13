@@ -724,6 +724,482 @@ img {
   font-size: 1rem;
 }
 
+/* ──────────────────────────────────────
+   unit status — NieR-style fill bar panel
+   ────────────────────────────────────── */
+
+.unit-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 14px 14px;
+  border: 1px solid var(--line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.08)),
+    rgba(10, 10, 12, 0.5);
+  clip-path: polygon(
+    0 0, calc(100% - 8px) 0, 100% 8px,
+    100% calc(100% - 4px), calc(100% - 4px) 100%,
+    4px 100%, 0 calc(100% - 4px)
+  );
+}
+
+.unit-status__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.unit-status__label {
+  color: var(--text);
+}
+
+.unit-status__id {
+  color: var(--text-muted);
+}
+
+.unit-status__counts {
+  display: flex;
+  gap: 18px;
+  font-family: var(--font-mono);
+}
+
+.unit-status__counts span {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.unit-status__counts em {
+  font-style: normal;
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.unit-status__counts strong {
+  font-size: 1rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.status-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.status-bar__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+}
+
+.status-bar__label {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.status-bar__value {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.status-bar__value strong {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.04em;
+}
+
+.status-bar__max {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.status-bar__track {
+  position: relative;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+}
+
+.status-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(200, 192, 184, 0.4), rgba(232, 230, 227, 0.2));
+  transition: width 1200ms var(--ease-nier);
+  animation: status-bar-sweep 1400ms var(--ease-nier);
+}
+
+.status-bar__pct {
+  display: none;
+}
+
+
+@keyframes status-bar-sweep {
+  from { width: 0; }
+}
+
+/* ──────────────────────────────────────
+   country briefing card — NieR mission-style
+   ────────────────────────────────────── */
+
+.country-brief {
+  position: relative;
+  padding: 14px 18px 18px;
+  border: 1px solid var(--line-strong);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(0, 0, 0, 0.15)),
+    rgba(10, 10, 12, 0.6);
+  clip-path: polygon(
+    0 0, calc(100% - 14px) 0, 100% 14px,
+    100% 100%, 14px 100%, 0 calc(100% - 14px)
+  );
+  overflow: hidden;
+  animation: country-brief-in 500ms var(--ease-nier);
+}
+
+.country-brief::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgba(218, 212, 204, 0.06), transparent);
+  transform: translateX(-100%);
+  animation: country-brief-sweep 900ms var(--ease-nier);
+}
+
+.country-brief__meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.country-brief__code {
+  color: var(--text);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+}
+
+.country-brief__row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.country-brief__flag {
+  position: relative;
+  flex: none;
+  width: 72px;
+  height: 54px;
+  border: 1px solid var(--line);
+  padding: 2px;
+  background: rgba(0, 0, 0, 0.4);
+  clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  overflow: hidden;
+}
+
+.country-brief__flag :global(img),
+.country-brief__flag img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+  display: block;
+}
+
+.country-brief__body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.country-brief__name {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 1.4rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  line-height: 1.1;
+  color: var(--text);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.country-brief__stats {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-mono);
+}
+
+.country-brief__stat {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.country-brief__stat-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.country-brief__stat strong {
+  font-size: 1.1rem;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: 0.06em;
+}
+
+.country-brief__divider {
+  width: 1px;
+  height: 28px;
+  background: var(--line);
+}
+
+.country-brief__ticks {
+  display: flex;
+  gap: 3px;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--line);
+}
+
+.country-brief__ticks span {
+  flex: 1;
+  height: 4px;
+  background: var(--line);
+}
+
+.country-brief__ticks span:nth-child(3n) {
+  background: var(--line-strong);
+  opacity: 0.6;
+}
+
+.country-brief__ticks span:nth-child(4) {
+  background: var(--text-dim);
+  height: 8px;
+  margin-top: -2px;
+  opacity: 0.8;
+}
+
+@keyframes country-brief-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%, 0 100%, 0 100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+    clip-path: polygon(
+      0 0, calc(100% - 14px) 0, 100% 14px,
+      100% 100%, 14px 100%, 0 calc(100% - 14px)
+    );
+  }
+}
+
+@keyframes country-brief-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+/* ──────────────────────────────────────
+   recon archive — NieR intel card with image + scanlines
+   ────────────────────────────────────── */
+
+.recon-archive {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border: 1px solid var(--line);
+  background: rgba(10, 10, 12, 0.6);
+  clip-path: polygon(
+    0 0, calc(100% - 10px) 0, 100% 10px,
+    100% 100%, 10px 100%, 0 calc(100% - 10px)
+  );
+  padding: 0;
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  width: 100%;
+}
+
+.recon-archive:hover {
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.recon-archive:hover .recon-archive__image {
+  filter: grayscale(0.6) brightness(0.7) contrast(1.15);
+}
+
+.recon-archive:hover .recon-archive__spin {
+  animation-duration: 2s;
+}
+
+.recon-archive__frame {
+  position: relative;
+  height: 90px;
+  overflow: hidden;
+}
+
+.recon-archive__image {
+  position: absolute;
+  inset: 0;
+  background-image: url("/assets/nier/nebula.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(0.9) brightness(0.55) contrast(1.1);
+  opacity: 0.75;
+  mix-blend-mode: luminosity;
+}
+
+.recon-archive__frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(10, 10, 12, 0.9) 100%
+  );
+  pointer-events: none;
+}
+
+.recon-archive__scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.25) 0,
+    rgba(0, 0, 0, 0.25) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  z-index: 2;
+}
+
+.recon-archive__sigil {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 58px;
+  height: 58px;
+  color: rgba(218, 212, 204, 0.75);
+  z-index: 3;
+  filter: drop-shadow(0 0 6px rgba(218, 212, 204, 0.35));
+}
+
+.recon-archive__spin {
+  transform-origin: 40px 40px;
+  animation: recon-spin 8s linear infinite;
+}
+
+.recon-archive__corner {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border: 1px solid var(--line-strong);
+  z-index: 3;
+}
+
+.recon-archive__corner--tl {
+  top: 8px;
+  left: 8px;
+  border-right: none;
+  border-bottom: none;
+}
+
+.recon-archive__corner--tr {
+  top: 8px;
+  right: 8px;
+  border-left: none;
+  border-bottom: none;
+}
+
+.recon-archive__corner--bl {
+  bottom: 8px;
+  left: 8px;
+  border-right: none;
+  border-top: none;
+}
+
+.recon-archive__corner--br {
+  bottom: 8px;
+  right: 8px;
+  border-left: none;
+  border-top: none;
+}
+
+.recon-archive__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px 12px;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.recon-archive__row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.recon-archive__row span {
+  color: var(--text-muted);
+}
+
+.recon-archive__row strong {
+  color: var(--text);
+  font-weight: 400;
+}
+
+.recon-archive__status {
+  color: var(--accent) !important;
+}
+
+@keyframes recon-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+
 .left-drawer__country-strip {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -3029,13 +3505,51 @@ button.mode-rank-card:hover {
     padding: 0 8px;
   }
 
-  .profile-menu__trigger strong {
-    display: none;
-  }
-
   .header-toggle {
     padding: 0 8px;
     font-size: 0.68rem;
+  }
+
+  .country-brief {
+    padding: 12px 14px 14px;
+  }
+
+  .country-brief__row {
+    gap: 12px;
+  }
+
+  .country-brief__flag {
+    width: 56px;
+    height: 42px;
+  }
+
+  .country-brief__name {
+    font-size: 1.1rem;
+  }
+
+  .country-brief__stats {
+    gap: 10px;
+  }
+
+  .country-brief__stat strong {
+    font-size: 0.95rem;
+  }
+
+  .recon-archive__frame {
+    height: 80px;
+  }
+
+  .recon-archive__sigil {
+    width: 48px;
+    height: 48px;
+  }
+
+  .unit-status__counts {
+    gap: 14px;
+  }
+
+  .unit-status__counts strong {
+    font-size: 0.9rem;
   }
 }
 
