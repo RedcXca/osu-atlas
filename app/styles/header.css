@@ -350,7 +350,8 @@
     display: none;
   }
 
-  .site-header {
+  .site-header,
+  .globe-revealed .site-header {
     max-height: none;
     grid-template-columns: 1fr;
     overflow: visible;
