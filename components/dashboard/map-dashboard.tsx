@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { MapPanel } from "@/components/dashboard/map-panel";
 import { BootSequence } from "@/components/fx/boot-sequence";
+import { SoundtrackProvider } from "@/components/fx/soundtrack-provider";
 import { LanguageProvider } from "@/lib/i18n/context";
 import { playDeselect, playSelect } from "@/lib/audio/ui-sounds";
 import type {
@@ -112,59 +113,61 @@ export function MapDashboard({
 
   return (
     <LanguageProvider>
-      <BootSequence onEnter={handleBootEnter} skip={!hasWebGL} username={viewer?.username}>
-        <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
-          {bootEntered && (
-            <SiteHeader
-              mutualOnly={mutualOnly}
-              onMutualOnlyChange={setMutualOnly}
-              viewer={viewer}
-            />
-          )}
-          <section className="dashboard-grid">
+      <SoundtrackProvider>
+        <BootSequence onEnter={handleBootEnter} skip={!hasWebGL} username={viewer?.username}>
+          <div className={`page-layout ${globeReady ? "globe-revealed" : ""}`}>
             {bootEntered && (
-            <LeftDrawer
-              authMessage={authMessage}
-              onFriendSortModeChange={setFriendSortMode}
-              onSelectCountry={handleSelectCountry}
-              snapshot={effectiveSnapshot}
+              <SiteHeader
+                mutualOnly={mutualOnly}
+                onMutualOnlyChange={setMutualOnly}
                 viewer={viewer}
               />
             )}
-            <MapPanel
-              bootEntered={bootEntered}
-              globeReady={globeReady}
-              hasWebGL={hasWebGL}
-              mapCountries={effectiveMapCountries}
-              onGlobeReady={handleGlobeReady}
-              onSelectCountry={handleSelectCountry}
-              selectedCode={selectedCode}
-              unknownCount={effectiveSnapshot.countries["UNKNOWN"]?.count ?? 0}
-            />
-            {bootEntered && (
-              <DashboardChrome
-                countrySortMode={countrySortMode}
-                friendSortMode={friendSortMode}
+            <section className="dashboard-grid">
+              {bootEntered && (
+                <LeftDrawer
+                  authMessage={authMessage}
+                  onFriendSortModeChange={setFriendSortMode}
+                  onSelectCountry={handleSelectCountry}
+                  snapshot={effectiveSnapshot}
+                  viewer={viewer}
+                />
+              )}
+              <MapPanel
+                bootEntered={bootEntered}
+                globeReady={globeReady}
+                hasWebGL={hasWebGL}
                 mapCountries={effectiveMapCountries}
-                onCountrySortModeChange={setCountrySortMode}
-                onFriendSortModeChange={setFriendSortMode}
-                onQueryChange={setQuery}
+                onGlobeReady={handleGlobeReady}
                 onSelectCountry={handleSelectCountry}
-                query={query}
                 selectedCode={selectedCode}
-                snapshot={effectiveSnapshot}
+                unknownCount={effectiveSnapshot.countries["UNKNOWN"]?.count ?? 0}
               />
-            )}
-          </section>
-        </div>
-        {globeReady && (
-          <DashboardFx
-            countryCount={effectiveSnapshot.totals.countryCount}
-            friendCount={effectiveSnapshot.totals.friendCount}
-            username={viewer?.username ?? "demo"}
-          />
-        )}
-      </BootSequence>
+              {bootEntered && (
+                <DashboardChrome
+                  countrySortMode={countrySortMode}
+                  friendSortMode={friendSortMode}
+                  mapCountries={effectiveMapCountries}
+                  onCountrySortModeChange={setCountrySortMode}
+                  onFriendSortModeChange={setFriendSortMode}
+                  onQueryChange={setQuery}
+                  onSelectCountry={handleSelectCountry}
+                  query={query}
+                  selectedCode={selectedCode}
+                  snapshot={effectiveSnapshot}
+                />
+              )}
+            </section>
+          </div>
+          {globeReady && (
+            <DashboardFx
+              countryCount={effectiveSnapshot.totals.countryCount}
+              friendCount={effectiveSnapshot.totals.friendCount}
+              username={viewer?.username ?? "demo"}
+            />
+          )}
+        </BootSequence>
+      </SoundtrackProvider>
     </LanguageProvider>
   );
 }
