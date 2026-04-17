@@ -420,6 +420,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
   border-bottom: 1px solid var(--line);
   padding-bottom: 10px;
   color: var(--text-muted);
@@ -427,6 +428,11 @@
   font-size: 0.66rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+.country-brief__kicker {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .country-brief__code {
@@ -516,7 +522,7 @@
   background: var(--line);
 }
 
-.country-brief__ticks {
+.country-brief__thresholds {
   display: flex;
   gap: 3px;
   margin-top: 14px;
@@ -524,22 +530,21 @@
   padding-top: 10px;
 }
 
-.country-brief__ticks span {
-  height: 4px;
+.country-brief__threshold {
   flex: 1;
+  height: 4px;
   background: var(--line);
+  transition: background 320ms var(--ease-nier), box-shadow 320ms var(--ease-nier);
 }
 
-.country-brief__ticks span:nth-child(3n) {
-  background: var(--line-strong);
-  opacity: 0.6;
+.country-brief__threshold[data-active="true"] {
+  background: var(--accent);
 }
 
-.country-brief__ticks span:nth-child(4) {
+.country-brief__threshold[data-leading="true"] {
   height: 8px;
   margin-top: -2px;
-  background: var(--text-dim);
-  opacity: 0.8;
+  box-shadow: 0 0 8px rgba(218, 212, 204, 0.4);
 }
 
 @keyframes edge-shimmer {

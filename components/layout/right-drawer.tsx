@@ -27,6 +27,25 @@ type RightDrawerProps = {
   totalFriends: number;
 };
 
+const FRIEND_THRESHOLDS = [1, 2, 3, 5, 10, 20, 50, 100, 200, 300, 500] as const;
+
+function FriendThresholdBar({ count }: { count: number }) {
+  const reached = FRIEND_THRESHOLDS.filter((t) => count >= t).length;
+  return (
+    <div className="country-brief__thresholds" aria-label={`${count} friends`}>
+      {FRIEND_THRESHOLDS.map((threshold, i) => (
+        <span
+          key={threshold}
+          className="country-brief__threshold"
+          data-active={i < reached}
+          data-leading={i === reached - 1}
+          title={`${threshold}+`}
+        />
+      ))}
+    </div>
+  );
+}
+
 // game mode sort labels stay in English
 const FRIEND_SORT_OPTIONS: { label: string; value: FriendSortMode }[] = [
   { label: "A-Z", value: "alphabetical" },
@@ -74,7 +93,7 @@ export const RightDrawer = memo(function RightDrawer({
                   </h2>
                   <div className="country-brief__stats">
                     <span className="country-brief__stat">
-                      <span className="country-brief__stat-label">TARGETS</span>
+                      <span className="country-brief__stat-label">FRIENDS</span>
                       <strong>{selectedCountry.count ?? 0}</strong>
                     </span>
                     <span className="country-brief__divider" />
@@ -85,11 +104,7 @@ export const RightDrawer = memo(function RightDrawer({
                   </div>
                 </div>
               </div>
-              <div className="country-brief__ticks" aria-hidden="true">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <span key={i} />
-                ))}
-              </div>
+              <FriendThresholdBar count={selectedCountry.count ?? 0} />
             </div>
 
             {selectedCountry.count > 0 ? (
