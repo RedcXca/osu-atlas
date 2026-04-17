@@ -1,6 +1,6 @@
 # [osu!](https://osu.ppy.sh) Atlas
 
-![osu! Atlas preview](public/og-preview.png)
+<img width="1920" height="915" alt="image" src="https://github.com/user-attachments/assets/b4367cb0-fe3b-4193-af1c-b4b4f635485a" />
 
 When I was on my trip to China I was looking for a tool like this to help me arrange meetups, but there wasn't one. So I made one.
 
