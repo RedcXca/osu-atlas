@@ -197,7 +197,7 @@
 }
 
 .status-bar[data-tone="accent"] .status-bar__fill {
-  background: linear-gradient(90deg, rgba(224, 188, 140, 0.5), var(--accent));
+  background: linear-gradient(90deg, rgba(218, 212, 204, 0.35), var(--accent));
 }
 
 .status-bar[data-tone="accent"] .status-bar__value strong {
